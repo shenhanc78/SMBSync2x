@@ -79,7 +79,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import jcifs.util.LogStream;
+// import jcifs.util.LogStream;
 
 import static android.content.Context.WINDOW_SERVICE;
 import static com.sentaroh.android.SMBSync2.Constants.APPLICATION_TAG;
@@ -302,7 +302,7 @@ public class GlobalParameters extends CommonGlobalParms {
 
     public SafManager safMgr = null;
 
-    private static LogStream logStream=null;//JCIFS logStream
+//    private static LogStream logStream=null;//JCIFS logStream
     private static Logger slf4jLog = LoggerFactory.getLogger(GlobalParameters.class);
 
     public GlobalParameters() {
@@ -393,8 +393,8 @@ public class GlobalParameters extends CommonGlobalParms {
             }
         };
         ps=new PrintStream(os);
-        LogStream.setInstance(ps);
-        logStream=LogStream.getInstance();//Initial create JCIFS logStream object
+//        LogStream.setInstance(ps);
+//        logStream=LogStream.getInstance();//Initial create JCIFS logStream object
 
         JcifsNgLogWriter jcifs_ng_lw=new JcifsNgLogWriter(jcifs_ng_lu);
         slf4jLog.setWriter(jcifs_ng_lw);
@@ -584,16 +584,16 @@ public class GlobalParameters extends CommonGlobalParms {
         settingDebugLevel = Integer.parseInt(prefs.getString(c.getString(R.string.settings_log_level), "0"));
         slf4jLog.setAppendTime(false);
         if (settingDebugLevel==0) {
-            LogStream.setLevel(1);
+//            LogStream.setLevel(1);
             slf4jLog.setLogOption(false, true, false, false, false);
         } else if (settingDebugLevel==1) {
-            LogStream.setLevel(2);
+//            LogStream.setLevel(2);
             slf4jLog.setLogOption(false, true, true, false, false);
         } else if (settingDebugLevel==2) {
-            LogStream.setLevel(5);
+//            LogStream.setLevel(5);
             slf4jLog.setLogOption(true, true, true, false, true);
         } else if (settingDebugLevel==3) {
-            LogStream.setLevel(5);
+//            LogStream.setLevel(5);
             slf4jLog.setLogOption(true, true, true, true, true);
         }
         settingExitClean=prefs.getBoolean(c.getString(R.string.settings_exit_clean), true);
