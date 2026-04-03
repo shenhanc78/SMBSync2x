@@ -361,6 +361,7 @@ public class GlobalParameters extends CommonGlobalParms {
         }
         applicationRootDirectory = c.getFilesDir().toString();
 
+        java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
         final LogUtil jcifs_ng_lu = new LogUtil(c, "SLF4J", this);
         final LogUtil jcifs_old_lu = new LogUtil(c, "JCIFS-V1", this);
 
