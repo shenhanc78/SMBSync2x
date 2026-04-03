@@ -15,11 +15,9 @@
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/main_tab_layout"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             app:tabIndicatorColor="#0088CC"
             app:tabIndicatorHeight="5dp"
-            app:tabBackground="@drawable/tab_bg_selector"
-            app:tabTextColor="@color/tab_textcolor_selector"
             app:tabTextAppearance="@style/TextAppearance.AppCompat.Medium"
             app:tabMaxWidth="0dp"
             app:tabGravity="fill"
