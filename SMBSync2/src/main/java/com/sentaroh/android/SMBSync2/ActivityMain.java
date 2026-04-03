@@ -206,8 +206,12 @@ public class ActivityMain extends AppCompatActivity {
         setTheme(mGp.applicationTheme);
         mGp.themeColorList = CommonUtilities.getThemeColorList(mActivity);
 //        getWindow().setNavigationBarColor(mGp.themeColorList.window_background_color_content);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_screen);
+
+        androidx.appcompat.widget.Toolbar toolbar = (androidx.appcompat.widget.Toolbar) findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
 
         mUtil = new CommonUtilities(mContext, "Main", mGp, getSupportFragmentManager());
         mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " entered, " + "mStartStatus=" + mStartStatus +", settingScreenThemeLanguage="+mGp.settingScreenThemeLanguage);
