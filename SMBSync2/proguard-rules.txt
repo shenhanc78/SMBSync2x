@@ -2,3 +2,4 @@
 -dontobfuscate
 -dontwarn com.adobe.xmp.**
 -dontwarn org.slf4j.**
+-dontwarn org.patched_slf4j.**
