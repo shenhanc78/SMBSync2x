@@ -66,7 +66,7 @@ import com.sentaroh.android.Utilities.ThreadCtrl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.LoggerWriter;
+// import org.slf4j.LoggerWriter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -396,8 +396,8 @@ public class GlobalParameters extends CommonGlobalParms {
 //        LogStream.setInstance(ps);
 //        logStream=LogStream.getInstance();//Initial create JCIFS logStream object
 
-        JcifsNgLogWriter jcifs_ng_lw=new JcifsNgLogWriter(jcifs_ng_lu);
-        slf4jLog.setWriter(jcifs_ng_lw);
+//        JcifsNgLogWriter jcifs_ng_lw=new JcifsNgLogWriter(jcifs_ng_lu);
+//        slf4jLog.setWriter(jcifs_ng_lw);
 
         initStorageStatus(c);
 
@@ -582,7 +582,8 @@ public class GlobalParameters extends CommonGlobalParms {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
 
         settingDebugLevel = Integer.parseInt(prefs.getString(c.getString(R.string.settings_log_level), "0"));
-        slf4jLog.setAppendTime(false);
+//        slf4jLog.setAppendTime(false);
+/*
         if (settingDebugLevel==0) {
 //            LogStream.setLevel(1);
             slf4jLog.setLogOption(false, true, false, false, false);
@@ -596,6 +597,7 @@ public class GlobalParameters extends CommonGlobalParms {
 //            LogStream.setLevel(5);
             slf4jLog.setLogOption(true, true, true, true, true);
         }
+*/
         settingExitClean=prefs.getBoolean(c.getString(R.string.settings_exit_clean), true);
 
         settingLogMaxFileCount = Integer.valueOf(prefs.getString(c.getString(R.string.settings_log_file_max_count), "5"));
@@ -965,6 +967,7 @@ public class GlobalParameters extends CommonGlobalParms {
         return pm.isInteractive();
     }
 
+/*
     class JcifsNgLogWriter extends LoggerWriter {
         private LogUtil mLu =null;
         public JcifsNgLogWriter(LogUtil lu) {
@@ -975,5 +978,6 @@ public class GlobalParameters extends CommonGlobalParms {
             mLu.addDebugMsg(1,"I", msg);
         }
     }
+*/
 
 }
