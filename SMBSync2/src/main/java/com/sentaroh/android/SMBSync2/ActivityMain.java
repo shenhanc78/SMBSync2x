@@ -48,11 +48,11 @@ import android.os.RemoteException;
 import android.os.StrictMode;
 import android.os.storage.StorageVolume;
 import android.provider.Settings;
-import android.support.design.widget.TabLayout;
-import android.support.v4.content.FileProvider;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import com.google.android.material.tabs.TabLayout;
+import androidx.core.content.FileProvider;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.ClipboardManager;
 import android.text.Editable;
 import android.text.InputType;
@@ -1440,117 +1440,140 @@ public class ActivityMain extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                processHomeButtonPress();
-                return true;
-            case R.id.menu_top_sync:
-                if (isUiEnabled()) {
-                    if (mGp.syncTaskAdapter.isShowCheckBox()) {
-                        if (SyncTaskUtil.getSyncTaskSelectedItemCount(mGp.syncTaskAdapter) > 0) {
-                            syncSelectedSyncTask();
-                        } else {
-                            //no sync task is selected
-                            mUtil.showCommonDialog(false, "W", mContext.getString(R.string.msgs_main_sync_select_prof_no_active_profile), "", null);
-                            return true;//do not reset to normal view to let user select a task
-                        }
-                    } else {
-                        syncAutoSyncTask();
-                    }
-                    SyncTaskUtil.setAllSyncTaskToUnchecked(true, mGp.syncTaskAdapter);
-                    setSyncTaskContextButtonNormalMode();
-                }
-                return true;
-            case R.id.menu_top_exec_schedule:
-                if (isUiEnabled()) {
-                    if (mGp.syncScheduleAdapter.isSelectMode()) {
-                        if (mGp.syncScheduleAdapter.getSelectedItemCount() > 0) {
-                            executeSelectedSchedule();
-                        } else {
-                            //no schedule is selected
-                            mUtil.showCommonDialog(false, "W", mContext.getString(R.string.msgs_schedule_sync_selected_schedule_not_found), "", null);
-                            return true;//do not reset to normal view to let user select a schedule
-                        }
-                    } else {
-                        executeAllEnabledSchedule();
-                    }
-                    SyncTaskUtil.setAllSyncTaskToUnchecked(true, mGp.syncTaskAdapter);
-                    setScheduleContextButtonNormalMode();
-                }
-                return true;
-            case R.id.menu_top_browse_log:
-                invokeLogFileBrowser();
-                setContextButtonNormalMode();
-                return true;
-            case R.id.menu_top_export:
-                NotifyEvent ntfy=new NotifyEvent(mContext);
-                ntfy.setListener(new NotifyEventListener() {
-                    @Override
-                    public void positiveResponse(Context context, Object[] objects) {
-                        mTaskUtil.exportSyncTaskListDlg();
-                        setContextButtonNormalMode();
-                    }
-                    @Override
-                    public void negativeResponse(Context context, Object[] objects) {}
-                });
-                ApplicationPasswordUtil.applicationPasswordAuthentication(mGp, mActivity, getSupportFragmentManager(),
-                        mUtil, false, ntfy, ApplicationPasswordUtil.APPLICATION_PASSWORD_RESOURCE_EXPORT_TASK_LIST);
-                return true;
-            case R.id.menu_top_import:
-                importSyncTaskAndParms();
-                setContextButtonNormalMode();
-                return true;
-            case R.id.menu_top_log_management:
-                invokeLogManagement();
-                setContextButtonNormalMode();
-                return true;
-            case R.id.menu_top_scheduler:
-                toggleScheduleEnabled();
-                return true;
-            case R.id.menu_top_about:
-                aboutSMBSync();
-                setContextButtonNormalMode();
-                return true;
-            case R.id.menu_top_settings:
-                invokeSettingsActivity();
-                setContextButtonNormalMode();
-                return true;
-            case R.id.menu_top_edit_force_usb_uuid_list:
-                EditUsbUuidList eu=new EditUsbUuidList(mActivity, mUtil);
-                return true;
-            case R.id.menu_top_kill:
-                killTerminateApplication();
-                setContextButtonNormalMode();
-                return true;
-            case R.id.menu_top_housekeep:
-                houseKeepManagementFile();
-                return true;
-            case R.id.menu_top_add_shortcut:
-                addShortcut();
-                return true;
-            case R.id.menu_top_show_battery_optimization:
-                showBatteryOptimization();
-                return true;
-            case R.id.menu_top_list_storage:
-                showSystemInfo();
-                return true;
-            case R.id.menu_top_select_storage:
-                reselectSdcard("", "");
-                return true;
-//            case R.id.menu_top_request_grant_coarse_location:
-//                mGp.setSettingGrantCoarseLocationRequired(mContext, true);
-//                checkLocationPermission(false);
-//                return true;
-//            case R.id.menu_top_start_logcat:
-//                LogCatUtil.startLogCat(mGp, mGp.getLogDirName(),"logcat.txt");
-//                return true;
-//            case R.id.menu_top_stop_logcat:
-//                LogCatUtil.stopLogCat(mGp, mUtil);
-//                return true;
-//            case R.id.menu_top_send_logcat:
-//                LogCatUtil.sendLogCat(mActivity, mGp, mUtil, mGp.getLogDirName(), "logcat.txt");
-//                return true;
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            processHomeButtonPress();
+            return true;
         }
+        if (id == R.id.menu_top_sync) {
+            if (isUiEnabled()) {
+                if (mGp.syncTaskAdapter.isShowCheckBox()) {
+                    if (SyncTaskUtil.getSyncTaskSelectedItemCount(mGp.syncTaskAdapter) > 0) {
+                        syncSelectedSyncTask();
+                    } else {
+                        //no sync task is selected
+                        mUtil.showCommonDialog(false, "W", mContext.getString(R.string.msgs_main_sync_select_prof_no_active_profile), "", null);
+                        return true;//do not reset to normal view to let user select a task
+                    }
+                } else {
+                    syncAutoSyncTask();
+                }
+                SyncTaskUtil.setAllSyncTaskToUnchecked(true, mGp.syncTaskAdapter);
+                setSyncTaskContextButtonNormalMode();
+            }
+            return true;
+        }
+        if (id == R.id.menu_top_exec_schedule) {
+            if (isUiEnabled()) {
+                if (mGp.syncScheduleAdapter.isSelectMode()) {
+                    if (mGp.syncScheduleAdapter.getSelectedItemCount() > 0) {
+                        executeSelectedSchedule();
+                    } else {
+                        //no schedule is selected
+                        mUtil.showCommonDialog(false, "W", mContext.getString(R.string.msgs_schedule_sync_selected_schedule_not_found), "", null);
+                        return true;//do not reset to normal view to let user select a schedule
+                    }
+                } else {
+                    executeAllEnabledSchedule();
+                }
+                SyncTaskUtil.setAllSyncTaskToUnchecked(true, mGp.syncTaskAdapter);
+                setScheduleContextButtonNormalMode();
+            }
+            return true;
+        }
+        if (id == R.id.menu_top_browse_log) {
+            invokeLogFileBrowser();
+            setContextButtonNormalMode();
+            return true;
+        }
+        if (id == R.id.menu_top_export) {
+            NotifyEvent ntfy = new NotifyEvent(mContext);
+            ntfy.setListener(new NotifyEventListener() {
+                @Override
+                public void positiveResponse(Context context, Object[] objects) {
+                    mTaskUtil.exportSyncTaskListDlg();
+                    setContextButtonNormalMode();
+                }
+
+                @Override
+                public void negativeResponse(Context context, Object[] objects) {
+                }
+            });
+            ApplicationPasswordUtil.applicationPasswordAuthentication(mGp, mActivity, getSupportFragmentManager(),
+                    mUtil, false, ntfy, ApplicationPasswordUtil.APPLICATION_PASSWORD_RESOURCE_EXPORT_TASK_LIST);
+            return true;
+        }
+        if (id == R.id.menu_top_import) {
+            importSyncTaskAndParms();
+            setContextButtonNormalMode();
+            return true;
+        }
+        if (id == R.id.menu_top_log_management) {
+            invokeLogManagement();
+            setContextButtonNormalMode();
+            return true;
+        }
+        if (id == R.id.menu_top_scheduler) {
+            toggleScheduleEnabled();
+            return true;
+        }
+        if (id == R.id.menu_top_about) {
+            aboutSMBSync();
+            setContextButtonNormalMode();
+            return true;
+        }
+        if (id == R.id.menu_top_settings) {
+            invokeSettingsActivity();
+            setContextButtonNormalMode();
+            return true;
+        }
+        if (id == R.id.menu_top_edit_force_usb_uuid_list) {
+            EditUsbUuidList eu = new EditUsbUuidList(mActivity, mUtil);
+            return true;
+        }
+        if (id == R.id.menu_top_kill) {
+            killTerminateApplication();
+            setContextButtonNormalMode();
+            return true;
+        }
+        if (id == R.id.menu_top_housekeep) {
+            houseKeepManagementFile();
+            return true;
+        }
+        if (id == R.id.menu_top_add_shortcut) {
+            addShortcut();
+            return true;
+        }
+        if (id == R.id.menu_top_show_battery_optimization) {
+            showBatteryOptimization();
+            return true;
+        }
+        if (id == R.id.menu_top_list_storage) {
+            showSystemInfo();
+            return true;
+        }
+        if (id == R.id.menu_top_select_storage) {
+            reselectSdcard("", "");
+            return true;
+        }
+
+//        if (id == R.id.menu_top_request_grant_coarse_location) {
+//            mGp.setSettingGrantCoarseLocationRequired(mContext, true);
+//            checkLocationPermission(false);
+//            return true;
+//        }
+//        if (id == R.id.menu_top_start_logcat) {
+//            LogCatUtil.startLogCat(mGp, mGp.getLogDirName(),"logcat.txt");
+//            return true;
+//        }
+//        if (id == R.id.menu_top_stop_logcat) {
+//            LogCatUtil.stopLogCat(mGp, mUtil);
+//            return true;
+//        }
+//        if (id == R.id.menu_top_send_logcat) {
+//            LogCatUtil.sendLogCat(mActivity, mGp, mUtil, mGp.getLogDirName(), "logcat.txt");
+//            return true;
+//        }
         if (isUiEnabled()) {
         }
         return false;
