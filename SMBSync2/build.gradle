@@ -66,7 +66,7 @@ android {
 
 dependencies {
     implementation files('libs/jcifs-ng-2.1.11-SNAPSHOT.jar')
-//    implementation 'org.slf4j:slf4j-api:1.7.36'
+    implementation 'org.slf4j:slf4j-api:1.7.36'
     implementation files('libs/bcprov-jdk15on-158.jar')
 
     implementation files('libs/Utilities-1.0.19.aar')
