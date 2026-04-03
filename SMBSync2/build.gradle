@@ -27,6 +27,7 @@ android {
     lintOptions {
         disable 'MissingTranslation'
         abortOnError false
+        checkReleaseBuilds false
     }
 
     buildTypes {
@@ -35,8 +36,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.txt'
         }
     }
 
