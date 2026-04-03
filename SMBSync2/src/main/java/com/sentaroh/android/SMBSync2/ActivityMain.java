@@ -2411,7 +2411,7 @@ public class ActivityMain extends AppCompatActivity {
 
     private NotifyEvent mNtfyExternalStoragePermission=null;
     private void checkRequiredPermissions(final NotifyEvent p_ntfy) {
-        if (Build.VERSION.SDK_INT >= 23) {
+        if (Build.VERSION.SDK_INT >= 23 && Build.VERSION.SDK_INT < 30) {
             mUtil.addDebugMsg(1, "I", "Prermission WriteExternalStorage=" + checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) +
                     ", WakeLock=" + checkSelfPermission(Manifest.permission.WAKE_LOCK));
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
