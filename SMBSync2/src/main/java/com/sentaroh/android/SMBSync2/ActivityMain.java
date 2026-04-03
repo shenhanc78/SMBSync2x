@@ -42,6 +42,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -2444,6 +2445,48 @@ public class ActivityMain extends AppCompatActivity {
                 mUtil.showCommonDialog(false, "W",
                         mContext.getString(R.string.msgs_main_permission_external_storage_title),
                         mContext.getString(R.string.msgs_main_permission_external_storage_request_msg), ntfy);
+            } else {
+                p_ntfy.notifyToListener(true, null);
+            }
+        } else if (Build.VERSION.SDK_INT >= 30) {
+            if (!Environment.isExternalStorageManager()) {
+                NotifyEvent ntfy = new NotifyEvent(mContext);
+                ntfy.setListener(new NotifyEventListener() {
+                    @Override
+                    public void positiveResponse(Context c, Object[] o) {
+                        try {
+                            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                            intent.addCategory("android.intent.category.DEFAULT");
+                            intent.setData(Uri.parse(String.format("package:%s", getPackageName())));
+                            startActivity(intent);
+                        } catch (Exception e) {
+                            Intent intent = new Intent();
+                            intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                            startActivity(intent);
+                        }
+                    }
+
+                    @Override
+                    public void negativeResponse(Context c, Object[] o) {
+                        NotifyEvent ntfy_term = new NotifyEvent(mContext);
+                        ntfy_term.setListener(new NotifyEventListener() {
+                            @Override
+                            public void positiveResponse(Context c, Object[] o) {
+                                isTaskTermination = true;
+                                finish();
+                            }
+
+                            @Override
+                            public void negativeResponse(Context c, Object[] o) {}
+                        });
+                        mUtil.showCommonDialog(false, "W",
+                                mContext.getString(R.string.msgs_main_permission_all_files_access_title),
+                                mContext.getString(R.string.msgs_main_permission_all_files_access_denied_msg), ntfy_term);
+                    }
+                });
+                mUtil.showCommonDialog(false, "W",
+                        mContext.getString(R.string.msgs_main_permission_all_files_access_title),
+                        mContext.getString(R.string.msgs_main_permission_all_files_access_request_msg), ntfy);
             } else {
                 p_ntfy.notifyToListener(true, null);
             }
