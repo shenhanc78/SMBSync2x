@@ -70,7 +70,6 @@ android {
 
 dependencies {
     implementation files('libs/jcifs-ng-2.1.11-SNAPSHOT.jar')
-    implementation files('libs/WrapperForSlf4j-1.0.2.jar')
     implementation files('libs/bcprov-jdk15on-158.jar')
 
     implementation files('libs/Utilities-1.0.19.aar')
