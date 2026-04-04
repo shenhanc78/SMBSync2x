@@ -36,16 +36,17 @@ import android.widget.CheckedTextView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.sentaroh.android.Utilities.Dialog.CommonDialog;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+
 import com.sentaroh.android.Utilities.NotifyEvent;
-import com.sentaroh.android.Utilities.ThemeUtil;
 
 public class ActivityPasswordSettings extends AppCompatActivity {
     private Context mContext=null;
     private GlobalParameters mGp=null;
     private Activity mActivity=null;
     private CommonUtilities mUtil = null;
-    private CommonDialog commonDlg = null;
+
 
     private LinearLayout mPreferenceView=null;
 
@@ -89,7 +90,6 @@ public class ActivityPasswordSettings extends AppCompatActivity {
 
         mUtil = new CommonUtilities(mActivity.getApplicationContext(), "AppPswd", mGp, getSupportFragmentManager());
 
-        commonDlg = new CommonDialog(mActivity, getSupportFragmentManager());
         setResult(RESULT_OK);
 
         mPreferenceView=(LinearLayout)findViewById(R.id.preference_application_password_dlg_view);
@@ -268,8 +268,17 @@ public class ActivityPasswordSettings extends AppCompatActivity {
                             @Override
                             public void negativeResponse(Context context, Object[] objects) {}
                         });
-                        mUtil.showCommonDialog(true, "W",
-                                mContext.getString(R.string.settings_security_application_password_confirm_remove), "", ntfy_confirm);
+                        new AlertDialog.Builder(mActivity)
+                            .setTitle("Warning")
+                            .setMessage(mContext.getString(R.string.settings_security_application_password_confirm_remove))
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    ntfy_confirm.notifyToListener(true, null);
+                                }
+                            })
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .show();
 
                     }
 
@@ -287,32 +296,37 @@ public class ActivityPasswordSettings extends AppCompatActivity {
         ApplicationPasswordUtil.saveApplicationPasswordHashValue(mGp, prefs,  hv) ;
     }
 
+    private void setViewEnabled(View v, boolean enabled) {
+        v.setEnabled(enabled);
+        v.setAlpha(enabled ? 1.0f : 0.5f);
+    }
+
     private void setAppPswdStatus() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         String hv= ApplicationPasswordUtil.getApplicationPasswordHashValue(prefs);
 
         if (hv.equals("")) {
             mAppPswdMsg.setText(mContext.getString(R.string.settings_security_application_password_not_created));
-            CommonDialog.setViewEnabled(mActivity, mButtonCreate, true);
-            CommonDialog.setViewEnabled(mActivity, mButtonChange, false);
-            CommonDialog.setViewEnabled(mActivity, mButtonRemove, false);
+            setViewEnabled(mButtonCreate, true);
+            setViewEnabled(mButtonChange, false);
+            setViewEnabled(mButtonRemove, false);
 
-            CommonDialog.setViewEnabled(mActivity, mCtvSettingTimeOut, false);
-            CommonDialog.setViewEnabled(mActivity, mCtvSettingAppStartup, false);
-            CommonDialog.setViewEnabled(mActivity, mCtvSettingUseEditTask, false);
-            CommonDialog.setViewEnabled(mActivity, mCtvSettingUseExportTask, false);
-            CommonDialog.setViewEnabled(mActivity, mCtvSettingInitSmbAccount, false);
+            setViewEnabled(mCtvSettingTimeOut, false);
+            setViewEnabled(mCtvSettingAppStartup, false);
+            setViewEnabled(mCtvSettingUseEditTask, false);
+            setViewEnabled(mCtvSettingUseExportTask, false);
+            setViewEnabled(mCtvSettingInitSmbAccount, false);
         } else {
             mAppPswdMsg.setText(mContext.getString(R.string.settings_security_application_password_created));
-            CommonDialog.setViewEnabled(mActivity, mButtonCreate, false);
-            CommonDialog.setViewEnabled(mActivity, mButtonChange, true);
-            CommonDialog.setViewEnabled(mActivity, mButtonRemove, true);
+            setViewEnabled(mButtonCreate, false);
+            setViewEnabled(mButtonChange, true);
+            setViewEnabled(mButtonRemove, true);
 
-            CommonDialog.setViewEnabled(mActivity, mCtvSettingTimeOut, true);
-            CommonDialog.setViewEnabled(mActivity, mCtvSettingAppStartup, true);
-            CommonDialog.setViewEnabled(mActivity, mCtvSettingUseEditTask, true);
-            CommonDialog.setViewEnabled(mActivity, mCtvSettingUseExportTask, true);
-            CommonDialog.setViewEnabled(mActivity, mCtvSettingInitSmbAccount, true);
+            setViewEnabled(mCtvSettingTimeOut, true);
+            setViewEnabled(mCtvSettingAppStartup, true);
+            setViewEnabled(mCtvSettingUseEditTask, true);
+            setViewEnabled(mCtvSettingUseExportTask, true);
+            setViewEnabled(mCtvSettingInitSmbAccount, true);
         }
     }
 

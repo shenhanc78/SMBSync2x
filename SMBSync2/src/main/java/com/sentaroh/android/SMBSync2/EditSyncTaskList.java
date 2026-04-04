@@ -25,8 +25,8 @@ import android.widget.TextView;
 
 
 import com.sentaroh.android.Utilities.CallBackListener;
-import com.sentaroh.android.Utilities.ContextButton.ContextButtonUtil;
-import com.sentaroh.android.Utilities.Dialog.CommonDialog;
+import android.widget.Toast;
+import android.app.AlertDialog;
 import com.sentaroh.android.Utilities.NotifyEvent;
 
 import java.util.ArrayList;
@@ -48,7 +48,21 @@ public class EditSyncTaskList {
         mGp=gp;
         mUtil=cu;
     }
-    
+
+    private void setViewEnabled(View v, boolean enabled) {
+        v.setEnabled(enabled);
+        v.setAlpha(enabled ? 1.0f : 0.5f);
+    }
+
+    private void setButtonLabelListener(View v, final String label) {
+        v.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast.makeText(mActivity, label, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+    }
     public void editSyncTaskList(final String prof_list, final NotifyEvent p_ntfy) {
         // カスタムダイアログの生成
         final Dialog dialog = new Dialog(mActivity, mGp.applicationTheme);
@@ -78,17 +92,13 @@ public class EditSyncTaskList {
 //        final TextView dlg_msg = (TextView) dialog.findViewById(R.id.edit_sync_task_list_dlg_msg);
 
         final ImageButton ib_add=(ImageButton)dialog.findViewById(R.id.context_button_add);
-        ContextButtonUtil.setButtonLabelListener(mActivity, ib_add,
-                mActivity.getString(R.string.msgs_edit_sync_task_list_cont_label_add_sync_task));
+        setButtonLabelListener(ib_add, mActivity.getString(R.string.msgs_edit_sync_task_list_cont_label_add_sync_task));
         final ImageButton ib_delete = (ImageButton) dialog.findViewById(R.id.context_button_delete);
-        ContextButtonUtil.setButtonLabelListener(mActivity, ib_delete,
-                mActivity.getString(R.string.msgs_edit_sync_task_list_cont_label_remove_sync_task));
+        setButtonLabelListener(ib_delete, mActivity.getString(R.string.msgs_edit_sync_task_list_cont_label_remove_sync_task));
         final ImageButton ib_select_all = (ImageButton) dialog.findViewById(R.id.context_button_select_all);
-        ContextButtonUtil.setButtonLabelListener(mActivity, ib_select_all,
-                mActivity.getString(R.string.msgs_edit_sync_task_list_cont_label_select_all));
+        setButtonLabelListener(ib_select_all, mActivity.getString(R.string.msgs_edit_sync_task_list_cont_label_select_all));
         final ImageButton ib_unselect_all = (ImageButton) dialog.findViewById(R.id.context_button_unselect_all);
-        ContextButtonUtil.setButtonLabelListener(mActivity, ib_unselect_all,
-                mActivity.getString(R.string.msgs_edit_sync_task_list_cont_label_unselect_all));
+        setButtonLabelListener(ib_unselect_all, mActivity.getString(R.string.msgs_edit_sync_task_list_cont_label_unselect_all));
 
 
         final Button btn_ok = (Button) dialog.findViewById(R.id.edit_data_list_dlg_ok);
@@ -134,9 +144,9 @@ public class EditSyncTaskList {
                 if (action_state==ItemTouchHelper.ACTION_STATE_IDLE) {
                     for(int i=0;i<mEditDataList.size();i++) data_list_adapter.notifyItemChanged(i);
                     if (isSyncTaskListChanged(prof_list, data_list_adapter)) {
-                        CommonDialog.setViewEnabled(mActivity, btn_ok, true);
+                        setViewEnabled(btn_ok, true);
                     } else {
-                        CommonDialog.setViewEnabled(mActivity, btn_ok, false);
+                        setViewEnabled(btn_ok, false);
                     }
                 }
             }
@@ -169,7 +179,7 @@ public class EditSyncTaskList {
         ItemTouchHelper ith  = new ItemTouchHelper(scb);
         ith.attachToRecyclerView(rv_task_list);
 
-        CommonDialog.setViewEnabled(mActivity, btn_ok, false);
+        setViewEnabled(btn_ok, false);
 
         setContextViewVisibility(dialog, data_list_adapter);
 
@@ -217,7 +227,7 @@ public class EditSyncTaskList {
                         data_list_adapter.unselectAllItem();
                         data_list_adapter.applyDataSetChanged();
                         setOkButtonEnabledEditSyncTaskList(dialog, curr_task_list, data_list_adapter);
-                        CommonDialog.setViewEnabled(mActivity, btn_ok, true);
+                        setViewEnabled(btn_ok, true);
                         setContextViewVisibility(dialog, data_list_adapter);
                     }
 
@@ -278,8 +288,17 @@ public class EditSyncTaskList {
                         public void negativeResponse(Context context, Object[] objects) {
                         }
                     });
-                    mUtil.showCommonDialog(true, "W",
-                            mActivity.getString(R.string.msgs_edit_sync_task_list_confirm_msg_nosave), "", ntfy);
+                    new AlertDialog.Builder(mActivity)
+                            .setTitle("Warning")
+                            .setMessage(mActivity.getString(R.string.msgs_edit_sync_task_list_confirm_msg_nosave))
+                            .setPositiveButton(android.R.string.ok, new android.content.DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(android.content.DialogInterface dialog, int which) {
+                                    ntfy.notifyToListener(true, null);
+                                }
+                            })
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .show();
                     return;
                 }
                 dialog.dismiss();
@@ -328,8 +347,8 @@ public class EditSyncTaskList {
                     mEditDataList.remove(etli);
                 }
                 data_list_adapter.applyDataSetChanged();
-                if (isSyncTaskListChanged(org_list, data_list_adapter)) CommonDialog.setViewEnabled(mActivity, btn_ok, true);
-                else CommonDialog.setViewEnabled(mActivity, btn_ok, false);
+                if (isSyncTaskListChanged(org_list, data_list_adapter)) setViewEnabled(btn_ok, true);
+                else setViewEnabled(btn_ok, false);
                 setContextViewVisibility(dialog, data_list_adapter);
             }
 
@@ -344,7 +363,17 @@ public class EditSyncTaskList {
                 del_task.add(etli);
             }
         }
-        mUtil.showCommonDialog(true, "W", mActivity.getString(R.string.msgs_edit_sync_task_list_delete_sync_task), del_list, ntfy_conf);
+        new AlertDialog.Builder(mActivity)
+                .setTitle("Warning")
+                .setMessage(mActivity.getString(R.string.msgs_edit_sync_task_list_delete_sync_task) + "\n" + del_list)
+                .setPositiveButton(android.R.string.ok, new android.content.DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(android.content.DialogInterface dialog, int which) {
+                        ntfy_conf.notifyToListener(true, null);
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
 
     }
 
@@ -377,16 +406,16 @@ public class EditSyncTaskList {
         if (task_list.equals("")) {
             dlg_msg.setVisibility(TextView.VISIBLE);
             dlg_msg.setText(mActivity.getString(R.string.msgs_edit_sync_task_list_info_sync_task_list_was_empty));
-            CommonDialog.setViewEnabled(mActivity, btn_ok, false);
+            setViewEnabled(btn_ok, false);
             return;
         } else {
             dlg_msg.setVisibility(TextView.GONE);
         }
         dlg_msg.setText("");
         if (!task_list.equals(org_task_list)) {
-            CommonDialog.setViewEnabled(mActivity, btn_ok, true);
+            setViewEnabled(btn_ok, true);
         } else {
-            CommonDialog.setViewEnabled(mActivity, btn_ok, false);
+            setViewEnabled(btn_ok, false);
         }
     }
 
@@ -579,7 +608,11 @@ public class EditSyncTaskList {
 
         ArrayList<DataListItem>add_task_list= getAddableTaskList(current_task_list);
         if (add_task_list.size()==0) {
-            mUtil.showCommonDialog(false, "W", mActivity.getString(R.string.msgs_edit_sync_task_list_add_sync_task_no_task_exists_for_add), "", null);
+            new AlertDialog.Builder(mActivity)
+                    .setTitle("Warning")
+                    .setMessage(mActivity.getString(R.string.msgs_edit_sync_task_list_add_sync_task_no_task_exists_for_add))
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
             return;
         }
         Collections.sort(add_task_list,new Comparator<DataListItem>(){
@@ -613,16 +646,16 @@ public class EditSyncTaskList {
         final AddDataListAdapter add_data_item_adapter = new AddDataListAdapter(mActivity, R.layout.data_list_add_data_item, add_task_list);
         lv_sync_list.setAdapter(add_data_item_adapter);
 
-        CommonDialog.setViewEnabled(mActivity, btn_ok, false);
+        setViewEnabled(btn_ok, false);
 
         NotifyEvent ntfy_check=new NotifyEvent(mActivity);
         ntfy_check.setListener(new NotifyEvent.NotifyEventListener() {
             @Override
             public void positiveResponse(Context context, Object[] objects) {
-                CommonDialog.setViewEnabled(mActivity, btn_ok, false);
+                setViewEnabled(btn_ok, false);
                 for(int i=0;i<add_data_item_adapter.getCount();i++) {
                     if (add_data_item_adapter.getItem(i).item_checked) {
-                        CommonDialog.setViewEnabled(mActivity, btn_ok, true);
+                        setViewEnabled(btn_ok, true);
                         break;
                     }
                 }
@@ -639,10 +672,10 @@ public class EditSyncTaskList {
                 DataListItem atli=add_data_item_adapter.getItem(position);
                 atli.item_checked =!atli.item_checked;
                 add_data_item_adapter.notifyDataSetChanged();
-                CommonDialog.setViewEnabled(mActivity, btn_ok, false);
+                setViewEnabled(btn_ok, false);
                 for(int i=0;i<add_data_item_adapter.getCount();i++) {
                     if (add_data_item_adapter.getItem(i).item_checked) {
-                        CommonDialog.setViewEnabled(mActivity, btn_ok, true);
+                        setViewEnabled(btn_ok, true);
                         break;
                     }
                 }
@@ -656,10 +689,10 @@ public class EditSyncTaskList {
                     add_data_item_adapter.getItem(i).item_checked =true;
                 }
                 add_data_item_adapter.notifyDataSetChanged();
-                CommonDialog.setViewEnabled(mActivity, btn_ok, true);
+                setViewEnabled(btn_ok, true);
             }
         });
-        ContextButtonUtil.setButtonLabelListener(mActivity, ib_select_all, mActivity.getString(R.string.msgs_edit_sync_task_list_cont_label_select_all));
+        setButtonLabelListener(ib_select_all, mActivity.getString(R.string.msgs_edit_sync_task_list_cont_label_select_all));
 
         ib_unselect_all.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -668,10 +701,10 @@ public class EditSyncTaskList {
                     add_data_item_adapter.getItem(i).item_checked =false;
                 }
                 add_data_item_adapter.notifyDataSetChanged();
-                CommonDialog.setViewEnabled(mActivity, btn_ok, false);
+                setViewEnabled(btn_ok, false);
             }
         });
-        ContextButtonUtil.setButtonLabelListener(mActivity, ib_unselect_all, mActivity.getString(R.string.msgs_edit_sync_task_list_cont_label_unselect_all));
+        setButtonLabelListener(ib_unselect_all, mActivity.getString(R.string.msgs_edit_sync_task_list_cont_label_unselect_all));
 
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override

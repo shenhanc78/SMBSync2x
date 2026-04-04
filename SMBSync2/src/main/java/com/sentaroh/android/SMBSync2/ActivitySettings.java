@@ -45,8 +45,8 @@ import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
-import com.sentaroh.android.Utilities.Dialog.MessageDialogAppFragment;
-import com.sentaroh.android.Utilities.LocalMountPoint;
+import android.app.AlertDialog;
+import android.os.Environment;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -225,9 +225,11 @@ public class ActivitySettings extends PreferenceActivity {
                     th.start();
                 }
             } else {
-                MessageDialogAppFragment cd=MessageDialogAppFragment.newInstance(
-                        false, "E", c.getString(R.string.settings_playback_ringtone_volume_disabled),"");
-                cd.showDialog(fm, cd, null);
+                new AlertDialog.Builder(c)
+                        .setTitle("Error")
+                        .setMessage(c.getString(R.string.settings_playback_ringtone_volume_disabled))
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
             }
         }
     }
@@ -254,7 +256,7 @@ public class ActivitySettings extends PreferenceActivity {
 
             SharedPreferences shared_pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-            if (!LocalMountPoint.isExternalStorageAvailable()) {
+            if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
                 if (findPreference(getString(R.string.settings_mgt_dir))!=null) findPreference(getString(R.string.settings_mgt_dir)).setEnabled(false);
             }
 
