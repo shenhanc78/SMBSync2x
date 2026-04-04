@@ -23,7 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.sentaroh.android.Utilities.Dialog.CommonDialog;
+import android.app.AlertDialog;
 import com.sentaroh.android.Utilities.NotifyEvent;
 
 import java.io.File;
@@ -64,14 +64,26 @@ public class EditUsbUuidList{
             @Override
             public void negativeResponse(Context context, Object[] objects) {}
         });
-        mUtil.showCommonDialog(true, "W",
-                mContext.getString(R.string.msgs_edit_usb_uuid_menu_tittle),
-                mContext.getString(R.string.msgs_edit_usb_uuid_dialog_warning_message),
-                ntfy);
+        new AlertDialog.Builder(mActivity)
+                .setTitle(mContext.getString(R.string.msgs_edit_usb_uuid_menu_tittle))
+                .setMessage(mContext.getString(R.string.msgs_edit_usb_uuid_dialog_warning_message))
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        ntfy.notifyToListener(true, null);
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     private ArrayList<String> mNewUuidList=new ArrayList<String>();
     private AdapterRegeisteredUsbUuidList mMainListAdapter =null;
+    private void setViewEnabled(View v, boolean enabled) {
+        v.setEnabled(enabled);
+        v.setAlpha(enabled ? 1.0f : 0.5f);
+    }
+
     private void initView() {
         mDialog=new Dialog(mActivity, mGp.applicationTheme);
         mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -113,7 +125,7 @@ public class EditUsbUuidList{
                         mContext.getString(R.string.msgs_edit_usb_uuid_dialog_confirm_delete_message, item),
                         ntfy_delete);
 
-                CommonDialog.setViewEnabled(mActivity, mOkButton, true);
+                setViewEnabled(mOkButton, true);
             }
 
             @Override
@@ -128,7 +140,7 @@ public class EditUsbUuidList{
 //            }
 //        });
 
-        CommonDialog.setViewEnabled(mActivity, mOkButton, false);
+        setViewEnabled(mOkButton, false);
         mOkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -154,13 +166,29 @@ public class EditUsbUuidList{
                         list+=sep+"-"+list_item;
                         sep="\n";
                     }
-                    mUtil.showCommonDialog(true, "D", mContext.getString(R.string.msgs_edit_usb_uuid_dialog_confirm_save_title),
-                            mContext.getString(R.string.msgs_edit_usb_uuid_dialog_confirm_save_message, "\n"+list),
-                            ntfy);
+                    new AlertDialog.Builder(mActivity)
+                            .setTitle(mContext.getString(R.string.msgs_edit_usb_uuid_dialog_confirm_save_title))
+                            .setMessage(mContext.getString(R.string.msgs_edit_usb_uuid_dialog_confirm_save_message, "\n"+list))
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    ntfy.notifyToListener(true, null);
+                                }
+                            })
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .show();
                 } else {
-                    mUtil.showCommonDialog(true, "D", mContext.getString(R.string.msgs_edit_usb_uuid_dialog_confirm_delete_title),
-                            mContext.getString(R.string.msgs_edit_usb_uuid_dialog_confirm_delete_all_uuids_message),
-                            ntfy);
+                    new AlertDialog.Builder(mActivity)
+                            .setTitle(mContext.getString(R.string.msgs_edit_usb_uuid_dialog_confirm_delete_title))
+                            .setMessage(mContext.getString(R.string.msgs_edit_usb_uuid_dialog_confirm_delete_all_uuids_message))
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    ntfy.notifyToListener(true, null);
+                                }
+                            })
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .show();
                 }
 
             }
@@ -184,9 +212,17 @@ public class EditUsbUuidList{
                         @Override
                         public void negativeResponse(Context context, Object[] objects) {}
                     });
-                    mUtil.showCommonDialog(true, "W", mContext.getString(R.string.msgs_edit_usb_uuid_dialog_confirm_exit_title),
-                            mContext.getString(R.string.msgs_edit_usb_uuid_dialog_confirm_exit_message),
-                            ntfy);
+                    new AlertDialog.Builder(mActivity)
+                            .setTitle(mContext.getString(R.string.msgs_edit_usb_uuid_dialog_confirm_exit_title))
+                            .setMessage(mContext.getString(R.string.msgs_edit_usb_uuid_dialog_confirm_exit_message))
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    ntfy.notifyToListener(true, null);
+                                }
+                            })
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .show();
                 } else {
                     mDialog.dismiss();
                 }
@@ -205,7 +241,7 @@ public class EditUsbUuidList{
                             for(String add_item:added_list) mNewUuidList.add(add_item);
                             sortUuidList(mNewUuidList);
                             mMainListAdapter.notifyDataSetChanged();
-                            CommonDialog.setViewEnabled(mActivity, mOkButton, true);
+                            setViewEnabled(mOkButton, true);
                         }
                     }
 
@@ -218,7 +254,7 @@ public class EditUsbUuidList{
             }
         });
 
-        CommonDialog.setViewEnabled(mActivity, mAddSpecifiedUuidButton, false);
+        setViewEnabled(mAddSpecifiedUuidButton, false);
         mAddSpecifiedUuidButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -226,8 +262,8 @@ public class EditUsbUuidList{
                 sortUuidList(mNewUuidList);
                 mMainListAdapter.notifyDataSetChanged();
                 mInputUuid.setText("");
-                CommonDialog.setViewEnabled(mActivity, mAddSpecifiedUuidButton, false);
-                CommonDialog.setViewEnabled(mActivity, mOkButton, true);
+                setViewEnabled(mAddSpecifiedUuidButton, false);
+                setViewEnabled(mOkButton, true);
             }
         });
 
@@ -248,32 +284,32 @@ public class EditUsbUuidList{
                             if (uuid_array.length==2) {
                                 if (isUsbUuidAlreadyRegisterd(mNewUuidList, uuid)) {
                                     mMainMessage.setText(mContext.getString(R.string.msgs_edit_usb_uuid_dialog_audit_error_already_registered, uuid));
-                                    CommonDialog.setViewEnabled(mActivity, mAddSpecifiedUuidButton, false);
+                                    setViewEnabled(mAddSpecifiedUuidButton, false);
                                 } else {
                                     if ((uuid_array[0].toUpperCase().replaceAll("[0-9A-F]+", "").length()>0) ||
                                             (uuid_array[1].toUpperCase().replaceAll("[0-9A-F]+", "").length()>0)) {
-                                        CommonDialog.setViewEnabled(mActivity, mAddSpecifiedUuidButton, false);
+                                        setViewEnabled(mAddSpecifiedUuidButton, false);
                                         mMainMessage.setText(mContext.getString(R.string.msgs_edit_usb_uuid_dialog_audit_error_character_combination));
                                     } else {
-                                        CommonDialog.setViewEnabled(mActivity, mAddSpecifiedUuidButton, true);
+                                        setViewEnabled(mAddSpecifiedUuidButton, true);
                                         mMainMessage.setText("");
                                     }
                                 }
                             } else {
-                                CommonDialog.setViewEnabled(mActivity, mAddSpecifiedUuidButton, false);
+                                setViewEnabled(mAddSpecifiedUuidButton, false);
                                 mMainMessage.setText(mContext.getString(R.string.msgs_edit_usb_uuid_dialog_audit_error_format));
                             }
                         } else {
-                            CommonDialog.setViewEnabled(mActivity, mAddSpecifiedUuidButton, false);
+                            setViewEnabled(mAddSpecifiedUuidButton, false);
                             mMainMessage.setText(mContext.getString(R.string.msgs_edit_usb_uuid_dialog_audit_error_format));
                         }
                     } else {
-                        CommonDialog.setViewEnabled(mActivity, mAddSpecifiedUuidButton, false);
+                        setViewEnabled(mAddSpecifiedUuidButton, false);
                         mMainMessage.setText(mContext.getString(R.string.msgs_edit_usb_uuid_dialog_audit_error_length));
                     }
                 } else {
                     mMainMessage.setText("");
-                    CommonDialog.setViewEnabled(mActivity, mAddSpecifiedUuidButton, false);
+                    setViewEnabled(mAddSpecifiedUuidButton, false);
                 }
             }
         });
@@ -361,7 +397,7 @@ public class EditUsbUuidList{
                         break;
                     }
                 }
-                CommonDialog.setViewEnabled(mActivity, ok_btn, checked);
+                setViewEnabled(ok_btn, checked);
             }
 
             @Override
@@ -369,7 +405,7 @@ public class EditUsbUuidList{
         });
         adapter.setNotifyUuidClickListener(ntfy_click);
 
-        CommonDialog.setViewEnabled(mActivity, ok_btn, false);
+        setViewEnabled(ok_btn, false);
         ok_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

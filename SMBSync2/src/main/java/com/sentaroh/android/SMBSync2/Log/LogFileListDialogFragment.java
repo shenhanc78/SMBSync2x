@@ -33,8 +33,7 @@ import androidx.core.content.FileProvider;
 
 import com.sentaroh.android.SMBSync2.BuildConfig;
 import com.sentaroh.android.SMBSync2.R;
-import com.sentaroh.android.Utilities.Dialog.CommonDialog;
-import com.sentaroh.android.Utilities.Dialog.MessageDialogFragment;
+
 import com.sentaroh.android.Utilities.LogUtil.CommonLogFileListDialogFragment;
 
 import java.io.File;

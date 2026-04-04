@@ -36,7 +36,7 @@ import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.sentaroh.android.Utilities.Dialog.CommonDialog;
+import android.widget.Toast;
 import com.sentaroh.android.Utilities.NotifyEvent;
 
 import java.util.ArrayList;
@@ -297,8 +297,7 @@ class AdapterScheduleList extends ArrayAdapter<ScheduleItem> {
             holder.ib_sync_button.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    CommonDialog.showPopupMessageAsUpAnchorView((ActivityMain)(parent.getContext()), v,
-                            mContext.getString(R.string.msgs_schedule_list_edit_execute_selected_schedule_with_schedule_name, o.scheduleName), 2);
+                    Toast.makeText(mContext, mContext.getString(R.string.msgs_schedule_list_edit_execute_selected_schedule_with_schedule_name, o.scheduleName), Toast.LENGTH_SHORT).show();
                     return true;
                 }
             });
