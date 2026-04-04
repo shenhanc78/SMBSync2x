@@ -87,7 +87,7 @@ import com.sentaroh.android.SMBSync2.Log.LogFileListDialogFragment;
 import com.sentaroh.android.SMBSync2.Log.LogUtil;
 import com.sentaroh.android.Utilities.ContextButton.ContextButtonUtil;
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenu;
-import com.sentaroh.android.Utilities.Dialog.CommonDialog;
+
 import com.sentaroh.android.Utilities.Dialog.MessageDialogFragment;
 import com.sentaroh.android.Utilities.Dialog.ProgressBarDialogFragment;
 import com.sentaroh.android.Utilities.LocalMountPoint;
@@ -134,6 +134,38 @@ import static com.sentaroh.android.SMBSync2.ScheduleConstants.SCHEDULER_INTENT_S
 
 @SuppressLint("NewApi")
 public class ActivityMain extends AppCompatActivity {
+    private static void setViewEnabled(Activity a, View v, boolean enabled) {
+        if (v != null) {
+             v.setEnabled(enabled);
+             v.setAlpha(enabled ? 1.0f : 0.5f);
+        }
+    }
+    private static void setDlgBoxSizeLimit(Dialog dialog, boolean isCompact) {
+        if (dialog != null && dialog.getWindow() != null) {
+             WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+             lp.copyFrom(dialog.getWindow().getAttributes());
+             lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+             lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+             dialog.getWindow().setAttributes(lp);
+        }
+    }
+    private static void setDlgBoxSizeCompactWithInput(Dialog dialog) {
+        setDlgBoxSizeLimit(dialog, true);
+    }
+    private static void setMenuItemEnabled(Activity a, android.view.Menu menu, int id, boolean enabled) {
+        if (menu != null && menu.findItem(id) != null) {
+             menu.findItem(id).setEnabled(enabled);
+        }
+    }
+    private static void showPopupMessageAsDownAnchorView(Activity a, View v, String text, int pixels) {
+         android.widget.Toast.makeText(a, text, android.widget.Toast.LENGTH_SHORT).show();
+    }
+    private static void showPopupMessageAsUpAnchorView(Activity a, View v, String text, int pixels) {
+         android.widget.Toast.makeText(a, text, android.widget.Toast.LENGTH_SHORT).show();
+    }
+    private static float toPixel(android.content.res.Resources r, float dp) {
+         return android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
+    }
 
     private boolean isTaskTermination = false; // kill is disabled(enable is kill by onDestroy)
 
@@ -156,7 +188,7 @@ public class ActivityMain extends AppCompatActivity {
     private int mRestoreType = 0;
 
     private ServiceConnection mSvcConnection = null;
-    private CommonDialog mCommonDlg = null;
+    private com.sentaroh.android.Utilities.Dialog.CommonDialog mCommonDlg = null;
     private Handler mUiHandler = new Handler();
 
     private ActionBar mActionBar = null;
@@ -223,7 +255,7 @@ public class ActivityMain extends AppCompatActivity {
         else setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
         ccMenu = new CustomContextMenu(getResources(), getSupportFragmentManager());
-        mCommonDlg = new CommonDialog(mActivity, getSupportFragmentManager());
+        mCommonDlg = new com.sentaroh.android.Utilities.Dialog.CommonDialog(mActivity, getSupportFragmentManager());
         mTaskUtil = new SyncTaskUtil(mUtil, mActivity, mCommonDlg, ccMenu, mGp, getSupportFragmentManager());
         mGp.syncMessageListAdapter = new AdapterSyncMessage(mActivity, R.layout.msg_list_item_view, mGp.syncMessageList, mGp);
 
@@ -338,7 +370,7 @@ public class ActivityMain extends AppCompatActivity {
 
     private void processOnResumeForStart() {
         mGp.syncTaskListView.setVisibility(ListView.INVISIBLE);
-        final Dialog pd= CommonDialog.showProgressSpinIndicator(mActivity);
+        final Dialog pd= com.sentaroh.android.Utilities.Dialog.CommonDialog.showProgressSpinIndicator(mActivity);
         pd.show();
         Thread th = new Thread() {
             @Override
@@ -596,7 +628,7 @@ public class ActivityMain extends AppCompatActivity {
 
         tv_msg.setText(si_text);
 
-        CommonDialog.setDlgBoxSizeLimit(dialog,true);
+        setDlgBoxSizeLimit(dialog,true);
 
         btn_copy.setOnClickListener(new OnClickListener() {
             @Override
@@ -683,7 +715,7 @@ public class ActivityMain extends AppCompatActivity {
 
 //        btn_cancel.setText(mContext.getString(R.string.msgs_common_dialog_close));
 
-        CommonDialog.setDlgBoxSizeLimit(dialog,true);
+        setDlgBoxSizeLimit(dialog,true);
 
         btn_ok.setOnClickListener(new OnClickListener() {
             @Override
@@ -1024,8 +1056,7 @@ public class ActivityMain extends AppCompatActivity {
         mGp.scheduleInfoView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                CommonDialog.showPopupMessageAsUpAnchorView(mActivity, mGp.scheduleInfoView, mGp.scheduleInfoView.getText().toString(), 2,
-                        -(int)CommonDialog.toPixel(mContext.getResources(), 50));
+                android.widget.Toast.makeText(mActivity, mGp.scheduleInfoView.getText().toString(), android.widget.Toast.LENGTH_SHORT).show();
                 return true;
             }
         });
@@ -1215,9 +1246,9 @@ public class ActivityMain extends AppCompatActivity {
                         public boolean onLongClick(View v) {
                             if (v.getId()== R.id.menu_top_sync) {
                                 if (mGp.syncTaskAdapter.isShowCheckBox())  {
-                                    CommonDialog.showPopupMessageAsDownAnchorView(mActivity, v, mContext.getString(R.string.msgs_main_sync_selected_profiles_toast), 2);
+                                    showPopupMessageAsDownAnchorView(mActivity, v, mContext.getString(R.string.msgs_main_sync_selected_profiles_toast), 2);
                                 } else {
-                                    CommonDialog.showPopupMessageAsDownAnchorView(mActivity, v, mContext.getString(R.string.msgs_main_sync_auto_profiles_toast), 2);
+                                    showPopupMessageAsDownAnchorView(mActivity, v, mContext.getString(R.string.msgs_main_sync_auto_profiles_toast), 2);
                                 }
                                 return true;// notify long touch event is consumed
                             }
@@ -1234,9 +1265,9 @@ public class ActivityMain extends AppCompatActivity {
                         public boolean onLongClick(View v) {
                             if (v.getId()== R.id.menu_top_scheduler) {
                                 if (mGp.settingScheduleSyncEnabled)  {
-                                    CommonDialog.showPopupMessageAsDownAnchorView(mActivity, v, mContext.getString(R.string.msgs_schedule_list_edit_scheduler_service_toggle_disable), 2);
+                                    showPopupMessageAsDownAnchorView(mActivity, v, mContext.getString(R.string.msgs_schedule_list_edit_scheduler_service_toggle_disable), 2);
                                 } else {
-                                    CommonDialog.showPopupMessageAsDownAnchorView(mActivity, v, mContext.getString(R.string.msgs_schedule_list_edit_scheduler_service_toggle_enable), 2);
+                                    showPopupMessageAsDownAnchorView(mActivity, v, mContext.getString(R.string.msgs_schedule_list_edit_scheduler_service_toggle_enable), 2);
                                 }
                                 return true;// notify long touch event is consumed
                             }
@@ -1254,9 +1285,9 @@ public class ActivityMain extends AppCompatActivity {
                         public boolean onLongClick(View v) {
                             if (v.getId()== R.id.menu_top_exec_schedule) {
                                 if (mGp.syncScheduleAdapter.isSelectMode())  {
-                                    CommonDialog.showPopupMessageAsDownAnchorView(mActivity, v, mContext.getString(R.string.msgs_schedule_list_edit_execute_selected_schedule), 2);
+                                    showPopupMessageAsDownAnchorView(mActivity, v, mContext.getString(R.string.msgs_schedule_list_edit_execute_selected_schedule), 2);
                                 } else {
-                                    CommonDialog.showPopupMessageAsDownAnchorView(mActivity, v, mContext.getString(R.string.msgs_schedule_list_edit_execute_all_enabled_schedule), 2);
+                                    showPopupMessageAsDownAnchorView(mActivity, v, mContext.getString(R.string.msgs_schedule_list_edit_execute_all_enabled_schedule), 2);
                                 }
                                 return true;// notify long touch event is consumed
                             }
@@ -1436,7 +1467,7 @@ public class ActivityMain extends AppCompatActivity {
     }
 
     private void setMenuItemEnabled(Menu menu, MenuItem menu_item, boolean enabled) {
-        CommonDialog.setMenuItemEnabled(mActivity, menu, menu_item, enabled);
+        if (menu_item != null) menu_item.setEnabled(enabled);
     }
 
 
@@ -2125,7 +2156,7 @@ public class ActivityMain extends AppCompatActivity {
 
         final Button btnOk = (Button) dialog.findViewById(R.id.about_dialog_btn_ok);
 
-        CommonDialog.setDlgBoxSizeLimit(dialog, true);
+        setDlgBoxSizeLimit(dialog, true);
 
         // OKボタンの指定
         btnOk.setOnClickListener(new OnClickListener() {
@@ -3418,7 +3449,7 @@ public class ActivityMain extends AppCompatActivity {
 
         dlg_cmp.setVisibility(TextView.VISIBLE);
         dlg_cmp.setText(mContext.getString(R.string.msgs_schedule_confirm_msg_rename_warning));
-        CommonDialog.setDlgBoxSizeCompactWithInput(dialog);
+        setDlgBoxSizeCompactWithInput(dialog);
         etInput.setText(si.scheduleName);
 
         //do not check for whole schedule item validity, but only for schedule name
@@ -3437,7 +3468,7 @@ public class ActivityMain extends AppCompatActivity {
                     dlg_msg.setVisibility(TextView.VISIBLE);
                     dlg_msg.setText(error_msg);
                     dlg_msg.setTextColor(mGp.themeColorList.text_color_error);
-                    CommonDialog.setViewEnabled(mActivity, btn_ok, false);
+                    setViewEnabled(mActivity, btn_ok, false);
                     return;
                 } else {
                     btn_ok.setEnabled(true);
