@@ -55,7 +55,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.sentaroh.android.SMBSync2.Log.LogUtil;
-import com.sentaroh.android.Utilities.Dialog.CommonDialog;
+
 import com.sentaroh.android.Utilities.Dialog.MessageDialogFragment;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.StringUtil;
@@ -178,10 +178,8 @@ public final class CommonUtilities {
     }
 
     static public void showToastMessage(Activity c, String msg_txt, int duration) {
-        Toast toast=null;
-        if (duration==Toast.LENGTH_SHORT) toast=CommonDialog.getToastShort(c, msg_txt);
-        else toast=CommonDialog.getToastLong(c, msg_txt);
-        toast.setGravity(Gravity.BOTTOM, 0, (int) CommonDialog.toPixel(c.getResources(), 100));
+        Toast toast = Toast.makeText(c, msg_txt, duration);
+        toast.setGravity(Gravity.BOTTOM, 0, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, c.getResources().getDisplayMetrics()));
         toast.show();
     }
 
