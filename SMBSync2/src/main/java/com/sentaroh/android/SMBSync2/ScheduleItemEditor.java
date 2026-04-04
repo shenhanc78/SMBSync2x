@@ -60,7 +60,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenu;
-import com.sentaroh.android.Utilities.Dialog.CommonDialog;
+import android.app.AlertDialog;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
 import com.sentaroh.android.Utilities.StringUtil;
@@ -98,7 +98,7 @@ public class ScheduleItemEditor {
     private String mLatestSyncTaskList=null;
 
     ScheduleItemEditor(CommonUtilities mu, AppCompatActivity a, Context c,
-                       CommonDialog cd, CustomContextMenu ccm, GlobalParameters gp,
+                       Object cd, CustomContextMenu ccm, GlobalParameters gp,
                        boolean edit_mode, ArrayList<ScheduleItem> sl,
                        ScheduleItem si, NotifyEvent ntfy) {
         mContext = c;
@@ -127,6 +127,10 @@ public class ScheduleItemEditor {
             }
         },500);
     }
+    private void setViewEnabled(View v, boolean enabled) {
+        v.setEnabled(enabled);
+        v.setAlpha(enabled ? 1.0f : 0.5f);
+    }
 
     private boolean mScheduleChanged = false;
 
@@ -140,7 +144,7 @@ public class ScheduleItemEditor {
             buildSchedParms(dialog, new_si);
             if (mEditMode) mScheduleChanged = !curr_si.isSame(new_si);
             else mScheduleChanged=true;
-            CommonDialog.setButtonEnabled(mActivity, btn_ok, mScheduleChanged);
+            setViewEnabled(btn_ok, mScheduleChanged);
         }
         setOkButtonEnabledDisabled(dialog);
     }
@@ -245,7 +249,10 @@ public class ScheduleItemEditor {
         });
 //		loadScheduleData();
 
-        CommonDialog.setDlgBoxSizeLimit(dialog, true);
+        android.view.WindowManager.LayoutParams lp = new android.view.WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = (int)(mActivity.getResources().getDisplayMetrics().widthPixels * 0.9);
+        dialog.getWindow().setAttributes(lp);
 //		CommonDialog.setDlgBoxSizeHeightMax(dialog);
 
         setScheduleTypeSpinner(dialog, mSched.scheduleType);
@@ -288,9 +295,9 @@ public class ScheduleItemEditor {
 
         ctv_last_day.setChecked(mSched.scheduleDay.equals("99"));
         if (ctv_last_day.isChecked()) {
-            CommonDialog.setViewEnabled(mActivity, sp_sched_day, false);
+            setViewEnabled(sp_sched_day, false);
         } else {
-            CommonDialog.setViewEnabled(mActivity, sp_sched_day, true);
+            setViewEnabled(sp_sched_day, true);
         }
         setWarningMessageLastDay(dialog);
         ctv_last_day.setOnClickListener(new OnClickListener() {
@@ -299,9 +306,9 @@ public class ScheduleItemEditor {
                 ((CheckedTextView) v).toggle();
                 boolean isChecked = ((CheckedTextView) v).isChecked();
                 if(isChecked) {
-                    CommonDialog.setViewEnabled(mActivity, sp_sched_day, false);
+                    setViewEnabled(sp_sched_day, false);
                 } else {
-                    CommonDialog.setViewEnabled(mActivity, sp_sched_day, true);
+                    setViewEnabled(sp_sched_day, true);
                 }
                 setWarningMessageLastDay(dialog);
                 setScheduleWasChanged(dialog, mSched);
@@ -363,10 +370,16 @@ public class ScheduleItemEditor {
                                 @Override
                                 public void negativeResponse(Context c, Object[] o) {}
                             });
-                            mUtil.showCommonDialog(false, "W",
-                                    "Exact Alarms Permission Required",
-                                    "Android 14 requires explicit permission to set exact alarms for the scheduler to work reliably. Please click OK to open settings and enable 'Alarms & reminders' for SMBSync2.",
-                                    ntfy);
+                            new AlertDialog.Builder(mActivity)
+                                    .setTitle("Exact Alarms Permission Required")
+                                    .setMessage("Android 14 requires explicit permission to set exact alarms for the scheduler to work reliably. Please click OK to open settings and enable 'Alarms & reminders' for SMBSync2.")
+                                    .setPositiveButton(android.R.string.ok, new android.content.DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(android.content.DialogInterface dialog, int which) {
+                                            ntfy.notifyToListener(true, null);
+                                        }
+                                    })
+                                    .show();
                             return;
                         }
                     }
@@ -579,18 +592,18 @@ public class ScheduleItemEditor {
                         if (isChecked) {
                             btn_edit.setVisibility(Button.GONE);//.setEnabled(false);
 //                            tv_sync_prof.setVisibility(TextView.GONE);//.setEnabled(false);
-                            if (isScheduleWasChanged()) CommonDialog.setButtonEnabled(mActivity, btn_ok, true);
-                            else CommonDialog.setButtonEnabled(mActivity, btn_ok, false);
+                            if (isScheduleWasChanged()) setViewEnabled(btn_ok, true);
+                            else setViewEnabled(btn_ok, false);
                             tv_msg.setText("");
                         } else {
                             btn_edit.setVisibility(Button.VISIBLE);//.setEnabled(true);
 //                            tv_sync_prof.setVisibility(TextView.VISIBLE);//.setEnabled(true);
                             if (mLatestSyncTaskList.equals("")) {
-                                CommonDialog.setButtonEnabled(mActivity, btn_ok, false);
+                                setViewEnabled(btn_ok, false);
                                 tv_msg.setText(mContext.getString(R.string.msgs_scheduler_edit_sync_prof_list_not_specified));
                             } else {
-                                if (isScheduleWasChanged()) CommonDialog.setButtonEnabled(mActivity, btn_ok, true);
-                                else CommonDialog.setButtonEnabled(mActivity, btn_ok, false);
+                                if (isScheduleWasChanged()) setViewEnabled(btn_ok, true);
+                                else setViewEnabled(btn_ok, false);
                                 tv_msg.setText("");
                             }
                         }
@@ -602,18 +615,18 @@ public class ScheduleItemEditor {
                     if (isChecked) {
                         btn_edit.setVisibility(Button.GONE);//.setEnabled(false);
 //                        tv_sync_prof.setVisibility(TextView.GONE);//.setEnabled(false);
-                        if (isScheduleWasChanged()) CommonDialog.setButtonEnabled(mActivity, btn_ok, true);
-                        else CommonDialog.setButtonEnabled(mActivity, btn_ok, false);
+                        if (isScheduleWasChanged()) setViewEnabled(btn_ok, true);
+                        else setViewEnabled(btn_ok, false);
                         tv_msg.setText("");
                     } else {
                         btn_edit.setVisibility(Button.VISIBLE);//.setEnabled(true);
 //                        tv_sync_prof.setVisibility(TextView.VISIBLE);//.setEnabled(true);
                         if (mLatestSyncTaskList.equals("")) {
                             tv_msg.setText(mContext.getString(R.string.msgs_scheduler_edit_sync_prof_list_not_specified));
-                            CommonDialog.setButtonEnabled(mActivity, btn_ok, false);
+                            setViewEnabled(btn_ok, false);
                         } else {
-                            if (isScheduleWasChanged()) CommonDialog.setButtonEnabled(mActivity, btn_ok, true);
-                            else CommonDialog.setButtonEnabled(mActivity, btn_ok, false);
+                            if (isScheduleWasChanged()) setViewEnabled(btn_ok, true);
+                            else setViewEnabled(btn_ok, false);
                             tv_msg.setText("");
                         }
                     }
@@ -634,10 +647,10 @@ public class ScheduleItemEditor {
                         setEditTaskListButtonLabel(dialog);
                         if (mLatestSyncTaskList.equals("")) {
                             tv_msg.setText(mContext.getString(R.string.msgs_scheduler_edit_sync_prof_list_not_specified));
-                            CommonDialog.setButtonEnabled(mActivity, btn_ok, false);
+                            setViewEnabled(btn_ok, false);
                         } else {
-                            if (isScheduleWasChanged()) CommonDialog.setButtonEnabled(mActivity, btn_ok, true);
-                            else CommonDialog.setButtonEnabled(mActivity, btn_ok, false);
+                            if (isScheduleWasChanged()) setViewEnabled(btn_ok, true);
+                            else setViewEnabled(btn_ok, false);
                             tv_msg.setText("");
                             setScheduleWasChanged(dialog, mSched);
                         }
@@ -679,9 +692,17 @@ public class ScheduleItemEditor {
                         public void negativeResponse(Context context, Object[] objects) {
                         }
                     });
-                    mUtil.showCommonDialog(true, "W",
-                            mContext.getString(R.string.msgs_schedule_confirm_title_nosave),
-                            mContext.getString(R.string.msgs_schedule_confirm_msg_nosave), ntfy);
+                    new AlertDialog.Builder(mActivity)
+                            .setTitle(mContext.getString(R.string.msgs_schedule_confirm_title_nosave))
+                            .setMessage(mContext.getString(R.string.msgs_schedule_confirm_msg_nosave))
+                            .setPositiveButton(android.R.string.ok, new android.content.DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(android.content.DialogInterface dialogInterface, int i) {
+                                    ntfy.notifyToListener(true, null);
+                                }
+                            })
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .show();
                 } else {
                     dialog.dismiss();
                 }
@@ -764,7 +785,7 @@ public class ScheduleItemEditor {
         final TextView tv_msg = (TextView) dialog.findViewById(R.id.scheduler_main_dlg_msg);
 //        final TextView tv_sync_prof = (TextView) dialog.findViewById(R.id.scheduler_main_dlg_sync_task_list);
         final CheckedTextView ctv_sync_all_prof = (CheckedTextView) dialog.findViewById(R.id.scheduler_main_dlg_ctv_sync_all_sync_task);
-        CommonDialog.setButtonEnabled(mActivity, btn_ok, !mEditMode);
+        setViewEnabled(btn_ok, !mEditMode);
 
         String error_msg = "";
         ScheduleItem si = mSched;
@@ -780,11 +801,11 @@ public class ScheduleItemEditor {
         error_msg = ScheduleUtil.isValidScheduleItem(mContext, mGp, mScheduleList, si, mEditMode, false);
         if (!error_msg.equals("")) {
             tv_msg.setText(error_msg);
-            CommonDialog.setButtonEnabled(mActivity, btn_ok, false);
+            setViewEnabled(btn_ok, false);
         } else {
             tv_msg.setText("");
-            if (isScheduleWasChanged()) CommonDialog.setButtonEnabled(mActivity, btn_ok, true);
-            else CommonDialog.setButtonEnabled(mActivity, btn_ok, false);
+            if (isScheduleWasChanged()) setViewEnabled(btn_ok, true);
+            else setViewEnabled(btn_ok, false);
         }
     }
 
@@ -830,11 +851,11 @@ public class ScheduleItemEditor {
         if (cb_sched_sun.isChecked() || cb_sched_mon.isChecked() || cb_sched_tue.isChecked() ||
                 cb_sched_wed.isChecked() || cb_sched_thu.isChecked() || cb_sched_fri.isChecked() ||
                 cb_sched_sat.isChecked()) {
-            CommonDialog.setViewEnabled(mActivity, ctv_sync_all_prof, true);
-            CommonDialog.setViewEnabled(mActivity, btn_edit, true);
+            setViewEnabled(ctv_sync_all_prof, true);
+            setViewEnabled(btn_edit, true);
 
             tv_msg.setText("");
-            CommonDialog.setButtonEnabled(mActivity, btn_ok, true);
+            setViewEnabled(btn_ok, true);
 
             ScheduleItem n_sp = ScheduleUtil.copyScheduleData(mGp, mSched);
             buildSchedParms(dialog, n_sp);
@@ -843,8 +864,8 @@ public class ScheduleItemEditor {
                             StringUtil.convDateTimeTo_YearMonthDayHourMinSec(ScheduleUtil.getNextSchedule(n_sp))));
             setOkButtonEnabledDisabled(dialog);
         } else {
-            CommonDialog.setViewEnabled(mActivity, ctv_sync_all_prof, false);
-            CommonDialog.setViewEnabled(mActivity, btn_edit, false);
+            setViewEnabled(ctv_sync_all_prof, false);
+            setViewEnabled(btn_edit, false);
             mSched.isChanged=false;
             tv_msg.setText(mContext.getString(R.string.msgs_scheduler_main_dw_not_selected));
             tv_schedule_time.setText(

@@ -42,7 +42,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sentaroh.android.Utilities.Base64Compat;
-import com.sentaroh.android.Utilities.Dialog.CommonDialog;
+import android.app.AlertDialog;
 import com.sentaroh.android.Utilities.EncryptUtil;
 import com.sentaroh.android.Utilities.NotifyEvent;
 
@@ -144,7 +144,10 @@ public class ApplicationPasswordUtil {
         final Button btn_ok=(Button)dialog.findViewById(R.id.password_input_ok_btn);
         final Button btn_cancel=(Button)dialog.findViewById(R.id.password_input_cancel_btn);
 
-        CommonDialog.setDlgBoxSizeCompactWithInput(dialog);
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = (int)(mActivity.getResources().getDisplayMetrics().widthPixels * 0.9);
+        dialog.getWindow().setAttributes(lp);
 
         btn_ok.setEnabled(false);
         et_pswd1.addTextChangedListener(new TextWatcher(){
@@ -191,7 +194,11 @@ public class ApplicationPasswordUtil {
                     pw.flush();
                     pw.close();
 
-                    mUtil.showCommonDialog(false, "E","Application password authentication error",sw.toString(), null);
+                    new AlertDialog.Builder(mActivity)
+                            .setTitle("Application password authentication error")
+                            .setMessage(sw.toString())
+                            .setPositiveButton(android.R.string.ok, null)
+                            .show();
                     mUtil.addLogMsg("E","Application password authentication error");
                     mUtil.addLogMsg("E",sw.toString());
                 }
@@ -252,7 +259,10 @@ public class ApplicationPasswordUtil {
         final Button btn_ok=(Button)dialog.findViewById(R.id.password_input_ok_btn);
         final Button btn_cancel=(Button)dialog.findViewById(R.id.password_input_cancel_btn);
 
-        CommonDialog.setDlgBoxSizeCompactWithInput(dialog);
+        WindowManager.LayoutParams lp2 = new WindowManager.LayoutParams();
+        lp2.copyFrom(dialog.getWindow().getAttributes());
+        lp2.width = (int)(mActivity.getResources().getDisplayMetrics().widthPixels * 0.9);
+        dialog.getWindow().setAttributes(lp2);
 
 //        tv_title.setText("Application startup password");
 
@@ -306,7 +316,11 @@ public class ApplicationPasswordUtil {
                     pw.flush();
                     pw.close();
 
-                    mUtil.showCommonDialog(false,"E","Application password creation error",sw.toString(), null);
+                    new AlertDialog.Builder(mActivity)
+                            .setTitle("Application password creation error")
+                            .setMessage(sw.toString())
+                            .setPositiveButton(android.R.string.ok, null)
+                            .show();
                     mUtil.addLogMsg("E","Application password creation error");
                     mUtil.addLogMsg("E",sw.toString());
 

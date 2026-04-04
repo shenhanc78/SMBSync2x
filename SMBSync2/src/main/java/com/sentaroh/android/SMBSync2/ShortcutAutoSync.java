@@ -33,8 +33,7 @@ import android.os.Handler;
 import androidx.fragment.app.FragmentActivity;
 import android.view.Window;
 
-import com.sentaroh.android.Utilities.Dialog.MessageDialogAppFragment;
-import com.sentaroh.android.Utilities.Dialog.MessageDialogFragment;
+import android.app.AlertDialog;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
 
@@ -132,10 +131,16 @@ public class ShortcutAutoSync extends FragmentActivity {
 
                             }
                         });
-                        final FragmentManager fm=getFragmentManager();
-                        MessageDialogAppFragment mdf=MessageDialogAppFragment.newInstance(false, "E",
-                                "SMBSync2", "ShortcutAutoSync start service error\n"+e.getMessage());
-                        mdf.showDialog(fm, mdf, ntfy);
+                        new AlertDialog.Builder(mActivity)
+                                .setTitle("SMBSync2")
+                                .setMessage("ShortcutAutoSync start service error\n"+e.getMessage())
+                                .setPositiveButton(android.R.string.ok, new android.content.DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(android.content.DialogInterface dialog, int which) {
+                                        ntfy.notifyToListener(true, null);
+                                    }
+                                })
+                                .show();
                     }
                 }
 
@@ -145,7 +150,22 @@ public class ShortcutAutoSync extends FragmentActivity {
                 }
             });
             if (!mGp.settingSuppressShortcutWarning) {
-                mUtil.showCommonDialog(true, "W", "auto syncを実行しますか？", "", ntfy);
+                new AlertDialog.Builder(mActivity)
+                        .setTitle("Warning")
+                        .setMessage("auto syncを実行しますか？")
+                        .setPositiveButton(android.R.string.ok, new android.content.DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(android.content.DialogInterface dialog, int which) {
+                                ntfy.notifyToListener(true, null);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new android.content.DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(android.content.DialogInterface dialog, int which) {
+                                ntfy.notifyToListener(false, null);
+                            }
+                        })
+                        .show();
             } else {
                 ntfy.notifyToListener(true, null);
             }
