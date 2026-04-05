@@ -28,7 +28,6 @@ import android.os.Build;
 import android.os.SystemClock;
 
 import com.sentaroh.android.SMBSync2.SyncThread.SyncThreadWorkArea;
-import com.sentaroh.android.Utilities.MiscUtil;
 import com.sentaroh.android.Utilities.SafFile;
 import com.sentaroh.jcifs.JcifsException;
 import com.sentaroh.jcifs.JcifsFile;

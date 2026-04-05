@@ -70,11 +70,9 @@ import android.widget.TextView;
 
 
 import com.sentaroh.android.Utilities.LocalMountPoint;
-import com.sentaroh.android.Utilities.MiscUtil;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
 import com.sentaroh.android.Utilities.SafManager;
-import com.sentaroh.android.Utilities.StringUtil;
 import com.sentaroh.android.Utilities.Widget.CustomSpinnerAdapter;
 
 import java.io.ByteArrayInputStream;

@@ -24,10 +24,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 
-import com.sentaroh.android.Utilities.CallBackListener;
 import android.widget.Toast;
 import android.app.AlertDialog;
-import com.sentaroh.android.Utilities.NotifyEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;

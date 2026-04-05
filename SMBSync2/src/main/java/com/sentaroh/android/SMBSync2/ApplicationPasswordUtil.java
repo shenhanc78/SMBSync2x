@@ -41,9 +41,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.sentaroh.android.Utilities.Base64Compat;
+import android.util.Base64;
 import android.app.AlertDialog;
-import com.sentaroh.android.Utilities.EncryptUtil;
 import com.sentaroh.android.Utilities.NotifyEvent;
 
 import java.io.PrintWriter;
@@ -184,7 +183,7 @@ public class ApplicationPasswordUtil {
                     else enc_password=KeyStoreUtil.getGeneratedPasswordOldVersion(mActivity, SMBSYNC2_KEY_STORE_ALIAS);
 
                     EncryptUtil.CipherParms cp_int = EncryptUtil.initDecryptEnv(enc_password);
-                    byte[] encrypted_hv=Base64Compat.decode(gp.settingSecurityApplicationPasswordHashValue, Base64Compat.NO_WRAP);
+                    byte[] encrypted_hv=Base64.decode(gp.settingSecurityApplicationPasswordHashValue, Base64.NO_WRAP);
                     decrypted_hv =EncryptUtil.decrypt(encrypted_hv, cp_int);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -306,7 +305,7 @@ public class ApplicationPasswordUtil {
                     else enc_password=KeyStoreUtil.getGeneratedPasswordOldVersion(mActivity, SMBSYNC2_KEY_STORE_ALIAS);
 
                     EncryptUtil.CipherParms cp_int = EncryptUtil.initDecryptEnv(enc_password);
-                    encrypted_hv=Base64Compat.encodeToString(EncryptUtil.encrypt(user_pw_hv, cp_int), Base64Compat.NO_WRAP);
+                    encrypted_hv=Base64.encodeToString(EncryptUtil.encrypt(user_pw_hv, cp_int), Base64.NO_WRAP);
                     ntfy_create.notifyToListener(true, new Object[]{encrypted_hv});
                 } catch (Exception e) {
                     e.printStackTrace();

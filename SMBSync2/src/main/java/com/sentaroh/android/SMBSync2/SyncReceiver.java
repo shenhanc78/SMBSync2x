@@ -34,8 +34,6 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
 import com.sentaroh.android.SMBSync2.Log.LogUtil;
-import com.sentaroh.android.Utilities.MiscUtil;
-import com.sentaroh.android.Utilities.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

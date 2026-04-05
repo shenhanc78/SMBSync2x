@@ -63,17 +63,14 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.sentaroh.android.Utilities.Base64Compat;
+import android.util.Base64;
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenu;
 
 import com.sentaroh.android.Utilities.Dialog.DialogBackKeyListener;
-import com.sentaroh.android.Utilities.EncryptUtil;
-import com.sentaroh.android.Utilities.EncryptUtil.CipherParms;
-import com.sentaroh.android.Utilities.MiscUtil;
+import com.sentaroh.android.SMBSync2.EncryptUtil.CipherParms;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
 import com.sentaroh.android.Utilities.SafFile;
-import com.sentaroh.android.Utilities.StringUtil;
 import com.sentaroh.android.Utilities.ThreadCtrl;
 import com.sentaroh.android.Utilities.TreeFilelist.TreeFilelistAdapter;
 import com.sentaroh.android.Utilities.TreeFilelist.TreeFilelistItem;
@@ -522,7 +519,7 @@ public class SyncTaskUtil {
                             if (enc_str.startsWith("ENC")) {
                                 pl = br.readLine();
                                 enc_str = pl.substring(6);
-                                byte[] enc_array = Base64Compat.decode(enc_str, Base64Compat.NO_WRAP);
+                                byte[] enc_array = Base64.decode(enc_str, Base64.NO_WRAP);
                                 CipherParms cp = EncryptUtil.initDecryptEnv(mGp.profileKeyPrefix + mGp.profilePassword);
                                 dec_str = EncryptUtil.decrypt(enc_array, cp);
                                 if (dec_str == null) {
@@ -633,7 +630,7 @@ public class SyncTaskUtil {
                             enc_str = pl.substring(6).replace(SMBSYNC2_PROF_ENC, "");
                         }
                         if (!enc_str.equals("")) {
-                            byte[] enc_array = Base64Compat.decode(enc_str, Base64Compat.NO_WRAP);
+                            byte[] enc_array = Base64.decode(enc_str, Base64.NO_WRAP);
                             String dec_str = "";
                             CipherParms cp = EncryptUtil.initDecryptEnv(mGp.profileKeyPrefix + passwd);
                             dec_str = EncryptUtil.decrypt(enc_array, cp);
@@ -5797,7 +5794,7 @@ public class SyncTaskUtil {
                                 !pl.startsWith(prof_pre + SMBSYNC2_PROF_DEC)) {
                             if (prof_encrypted) {
                                 String enc_str = pl.replace(prof_pre, "");
-                                byte[] enc_array = Base64Compat.decode(enc_str, Base64Compat.NO_WRAP);
+                                byte[] enc_array = Base64.decode(enc_str, Base64.NO_WRAP);
                                 String dec_str = EncryptUtil.decrypt(enc_array, cp);
                                 addSyncTaskList(context, gp, sdcard, prof_pre + dec_str, sync, ispl, util, cp_autosave, auto_save);
                             } else {
@@ -5867,21 +5864,21 @@ public class SyncTaskUtil {
                             String prof_pre = "";
                             if (pl.startsWith(SMBSYNC2_PROF_VER7)) prof_pre = SMBSYNC2_PROF_VER7;
                             String enc_str = pl.substring(6);
-                            byte[] dec_array = Base64Compat.decode(enc_str, Base64Compat.NO_WRAP);
+                            byte[] dec_array = Base64.decode(enc_str, Base64.NO_WRAP);
                             String dec_str = EncryptUtil.decrypt(dec_array, cp_int);
                             addSyncTaskList(context, gp, sdcard, prof_pre + dec_str, sync, ispl, util, null, auto_save);
                         } else if (pl.startsWith(SMBSYNC2_PROF_VER8)) {
                             String prof_pre="";
                             if (pl.startsWith(SMBSYNC2_PROF_VER8)) prof_pre= SMBSYNC2_PROF_VER8;
                             String enc_str=pl.substring(6);
-                            byte[] dec_array = Base64Compat.decode(enc_str, Base64Compat.NO_WRAP);
+                            byte[] dec_array = Base64.decode(enc_str, Base64.NO_WRAP);
                             String dec_str = EncryptUtil.decrypt(dec_array, cp_int);
                             addSyncTaskList(context, gp, sdcard,prof_pre+dec_str , sync, ispl, util, null, auto_save);
                         } else if (pl.startsWith(SMBSYNC2_PROF_VER9)) {
                             String prof_pre="";
                             if (pl.startsWith(SMBSYNC2_PROF_VER9)) prof_pre=SMBSYNC2_PROF_VER9;
                             String enc_str=pl.substring(6);
-                            byte[] dec_array = Base64Compat.decode(enc_str, Base64Compat.NO_WRAP);
+                            byte[] dec_array = Base64.decode(enc_str, Base64.NO_WRAP);
                             String dec_str = EncryptUtil.decrypt(dec_array, cp_int);
                             addSyncTaskList(context, gp, sdcard,prof_pre+dec_str , sync, ispl, util, null, auto_save);
                         } else {
@@ -7102,7 +7099,7 @@ public class SyncTaskUtil {
     private static String decryptByInternalPassword(CommonUtilities util, CipherParms cp_autosave, String enc_str) {
         String dec_str =null;
         try {
-            byte[] dec_array = Base64Compat.decode(enc_str, Base64Compat.NO_WRAP);
+            byte[] dec_array = Base64.decode(enc_str, Base64.NO_WRAP);
             dec_str = EncryptUtil.decrypt(dec_array, cp_autosave);
         } catch(Exception e) {
             String stm= MiscUtil.getStackTraceString(e);
@@ -8205,7 +8202,7 @@ public class SyncTaskUtil {
     private static String encryptByInternalPassword(GlobalParameters mGp, CommonUtilities util, CipherParms cp_int, String from_str) {
         String result="";
         try {
-            result= Base64Compat.encodeToString(EncryptUtil.encrypt(from_str, cp_int), Base64Compat.NO_WRAP);
+            result= Base64.encodeToString(EncryptUtil.encrypt(from_str, cp_int), Base64.NO_WRAP);
         } catch(Exception e) {
             result=null;
             e.printStackTrace();
@@ -8256,7 +8253,7 @@ public class SyncTaskUtil {
                 ofp = fp;
                 if (encrypt_required) {
                     byte[] enc_array = EncryptUtil.encrypt(SMBSYNC2_PROF_ENC, cp_sdcard);
-                    String enc_str = Base64Compat.encodeToString(enc_array, Base64Compat.NO_WRAP);
+                    String enc_str = Base64.encodeToString(enc_array, Base64.NO_WRAP);
 //					MiscUtil.hexString("", enc_array, 0, enc_array.length);
                     pw.println(CURRENT_SMBSYNC2_PROFILE_VERSION + SMBSYNC2_PROF_ENC + enc_str);
                 } else {
@@ -8580,13 +8577,13 @@ public class SyncTaskUtil {
 
                     if (sdcard) {
                         if (encrypt_required) {
-                            String enc = Base64Compat.encodeToString(EncryptUtil.encrypt(pl, cp_sdcard), Base64Compat.NO_WRAP);
+                            String enc = Base64.encodeToString(EncryptUtil.encrypt(pl, cp_sdcard), Base64.NO_WRAP);
                             pw.println(CURRENT_SMBSYNC2_PROFILE_VERSION + enc);
                         } else {
                             pw.println(CURRENT_SMBSYNC2_PROFILE_VERSION + pl);
                         }
                     } else {
-                        String enc = Base64Compat.encodeToString(EncryptUtil.encrypt(pl, cp_int), Base64Compat.NO_WRAP);
+                        String enc = Base64.encodeToString(EncryptUtil.encrypt(pl, cp_int), Base64.NO_WRAP);
                         pw.println(CURRENT_SMBSYNC2_PROFILE_VERSION + enc);
                     }
 
@@ -8692,9 +8689,9 @@ public class SyncTaskUtil {
                 SMBSYNC2_PROF_TYPE_SETTINGS + "\t" + key + "\t" + k_type + "\t" + k_val;
         if (encrypt_required) {
             byte[] out = EncryptUtil.encrypt(k_str, cp);
-            String enc = Base64Compat.encodeToString(
+            String enc = Base64.encodeToString(
                     out,
-                    Base64Compat.NO_WRAP);
+                    Base64.NO_WRAP);
             pw.println(CURRENT_SMBSYNC2_PROFILE_VERSION + enc);
         } else {
             pw.println(CURRENT_SMBSYNC2_PROFILE_VERSION + k_str);
@@ -8713,9 +8710,9 @@ public class SyncTaskUtil {
         String k_str =
                 SMBSYNC2_PROF_TYPE_SETTINGS + "\t" + key + "\t" + k_type + "\t" + k_val;
         if (encrypt_required) {
-            String enc = Base64Compat.encodeToString(
+            String enc = Base64.encodeToString(
                     EncryptUtil.encrypt(k_str, cp),
-                    Base64Compat.NO_WRAP);
+                    Base64.NO_WRAP);
             pw.println(CURRENT_SMBSYNC2_PROFILE_VERSION + enc);
         } else {
             pw.println(CURRENT_SMBSYNC2_PROFILE_VERSION + k_str);
@@ -8733,9 +8730,9 @@ public class SyncTaskUtil {
         String k_str =
                 SMBSYNC2_PROF_TYPE_SETTINGS + "\t" + key + "\t" + k_type + "\t" + k_val;
         if (encrypt_required) {
-            String enc = Base64Compat.encodeToString(
+            String enc = Base64.encodeToString(
                     EncryptUtil.encrypt(k_str, cp),
-                    Base64Compat.NO_WRAP);
+                    Base64.NO_WRAP);
             pw.println(CURRENT_SMBSYNC2_PROFILE_VERSION + enc);
         } else {
             pw.println(CURRENT_SMBSYNC2_PROFILE_VERSION + k_str);
@@ -8753,9 +8750,9 @@ public class SyncTaskUtil {
         String k_str =
                 SMBSYNC2_PROF_TYPE_SETTINGS + "\t" + key + "\t" + k_type + "\t" + k_val;
         if (encrypt_required) {
-            String enc = Base64Compat.encodeToString(
+            String enc = Base64.encodeToString(
                     EncryptUtil.encrypt(k_str, cp),
-                    Base64Compat.NO_WRAP);
+                    Base64.NO_WRAP);
             pw.println(CURRENT_SMBSYNC2_PROFILE_VERSION + enc);
         } else {
             pw.println(CURRENT_SMBSYNC2_PROFILE_VERSION + k_str);

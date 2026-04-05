@@ -25,9 +25,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import android.annotation.SuppressLint;
 
-import com.sentaroh.android.Utilities.Base64Compat;
-import com.sentaroh.android.Utilities.EncryptUtil;
-import com.sentaroh.android.Utilities.EncryptUtil.CipherParms;
+import android.util.Base64;
+import com.sentaroh.android.SMBSync2.EncryptUtil.CipherParms;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -226,7 +225,7 @@ public class ImportOldProfileList {
                                 if (prof_encrypted) {
                                     String enc_str = pl.replace(prof_pre, "");
 //									Log.v("","enc load="+enc_str);
-                                    byte[] enc_array = Base64Compat.decode(enc_str, Base64Compat.NO_WRAP);
+                                    byte[] enc_array = Base64.decode(enc_str, Base64.NO_WRAP);
                                     String dec_str = EncryptUtil.decrypt(enc_array, cp);
 //									Log.v("","dec load="+dec_str);
                                     addProfileList(gp, prof_pre + dec_str, sync, rem, lcl);

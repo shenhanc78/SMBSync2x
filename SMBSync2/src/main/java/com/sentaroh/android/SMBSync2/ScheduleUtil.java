@@ -29,8 +29,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.widget.TextView;
 
-import com.sentaroh.android.Utilities.StringUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -61,9 +61,6 @@ import android.widget.TextView;
 
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenu;
 import android.app.AlertDialog;
-import com.sentaroh.android.Utilities.NotifyEvent;
-import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
-import com.sentaroh.android.Utilities.StringUtil;
 import com.sentaroh.android.Utilities.ThemeColorList;
 import com.sentaroh.android.Utilities.Widget.CustomSpinnerAdapter;
 
@@ -100,7 +97,7 @@ public class ScheduleItemEditor {
     ScheduleItemEditor(CommonUtilities mu, AppCompatActivity a, Context c,
                        Object cd, CustomContextMenu ccm, GlobalParameters gp,
                        boolean edit_mode, ArrayList<ScheduleItem> sl,
-                       ScheduleItem si, NotifyEvent ntfy) {
+                       ScheduleItem si, com.sentaroh.android.Utilities.NotifyEvent ntfy) {
         mContext = c;
         mActivity = a;
         mGp = gp;
@@ -108,11 +105,26 @@ public class ScheduleItemEditor {
 //        commonDlg = cd;
         mSched = si;
         mLatestSyncTaskList=si.syncTaskList;
-//        Log.v("", "name=" + si.scheduleName);s
 
         mEditMode = edit_mode;
 
-        mNotify = ntfy;
+        if (ntfy != null) {
+            mNotify = new NotifyEvent(c);
+            mNotify.setListener(new NotifyEvent.NotifyEventListener() {
+                @Override
+                public void positiveResponse(Context context, Object[] objects) {
+                    ntfy.notifyToListener(true, objects);
+                }
+
+                @Override
+                public void negativeResponse(Context context, Object[] objects) {
+                    ntfy.notifyToListener(false, objects);
+                }
+            });
+        } else {
+            mNotify = null;
+        }
+        
         mScheduleList = sl;
 
         mThemeColorList = CommonUtilities.getThemeColorList(a);
@@ -355,7 +367,7 @@ public class ScheduleItemEditor {
                         if (am != null && !am.canScheduleExactAlarms()) {
                             ctv_sched_enabled.setChecked(false);
                             NotifyEvent ntfy = new NotifyEvent(mContext);
-                            ntfy.setListener(new NotifyEventListener() {
+                            ntfy.setListener(new NotifyEvent.NotifyEventListener() {
                                 @Override
                                 public void positiveResponse(Context c, Object[] o) {
                                     try {
@@ -640,7 +652,7 @@ public class ScheduleItemEditor {
             @Override
             public void onClick(View v) {
                 NotifyEvent ntfy = new NotifyEvent(mContext);
-                ntfy.setListener(new NotifyEventListener() {
+                ntfy.setListener(new NotifyEvent.NotifyEventListener() {
                     @Override
                     public void positiveResponse(Context c, Object[] o) {
                         mLatestSyncTaskList = (String) o[0];
@@ -682,7 +694,7 @@ public class ScheduleItemEditor {
             public void onClick(View v) {
                 if (isScheduleWasChanged()) {
                     NotifyEvent ntfy = new NotifyEvent(mContext);
-                    ntfy.setListener(new NotifyEventListener() {
+                    ntfy.setListener(new NotifyEvent.NotifyEventListener() {
                         @Override
                         public void positiveResponse(Context context, Object[] objects) {
                             dialog.dismiss();

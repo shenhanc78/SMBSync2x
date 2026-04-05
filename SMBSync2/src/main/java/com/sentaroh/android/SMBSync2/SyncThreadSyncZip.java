@@ -29,7 +29,6 @@ import android.os.SystemClock;
 import com.sentaroh.android.SMBSync2.SyncThread.SyncThreadWorkArea;
 import com.sentaroh.android.Utilities.BufferedZipFile;
 import com.sentaroh.android.Utilities.SafFile;
-import com.sentaroh.android.Utilities.StringUtil;
 import com.sentaroh.android.Utilities.ZipFileListItem;
 import com.sentaroh.android.Utilities.ZipUtil;
 
