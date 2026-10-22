@@ -2439,6 +2439,8 @@ public class ActivityMain extends AppCompatActivity {
     }
 
     private final int REQUEST_PERMISSIONS_WRITE_EXTERNAL_STORAGE = 1;
+    private final int REQUEST_PERMISSIONS_POST_NOTIFICATIONS = 2;
+    private final int ACTIVITY_REQUEST_CODE_ALL_FILES_ACCESS = 60;
 
     private NotifyEvent mNtfyExternalStoragePermission=null;
     private void checkRequiredPermissions(final NotifyEvent p_ntfy) {
@@ -2484,15 +2486,16 @@ public class ActivityMain extends AppCompatActivity {
                 ntfy.setListener(new NotifyEventListener() {
                     @Override
                     public void positiveResponse(Context c, Object[] o) {
+                        mNtfyExternalStoragePermission = p_ntfy;
                         try {
                             Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
                             intent.addCategory("android.intent.category.DEFAULT");
                             intent.setData(Uri.parse(String.format("package:%s", getPackageName())));
-                            startActivity(intent);
+                            startActivityForResult(intent, ACTIVITY_REQUEST_CODE_ALL_FILES_ACCESS);
                         } catch (Exception e) {
                             Intent intent = new Intent();
                             intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                            startActivity(intent);
+                            startActivityForResult(intent, ACTIVITY_REQUEST_CODE_ALL_FILES_ACCESS);
                         }
                     }
 
@@ -2518,11 +2521,22 @@ public class ActivityMain extends AppCompatActivity {
                         mContext.getString(R.string.msgs_main_permission_all_files_access_title),
                         mContext.getString(R.string.msgs_main_permission_all_files_access_request_msg), ntfy);
             } else {
-                checkExactAlarmPermission(p_ntfy);
+                checkNotificationPermission(p_ntfy);
             }
         } else {
-            checkExactAlarmPermission(p_ntfy);
+            checkNotificationPermission(p_ntfy);
         }
+    }
+
+    private void checkNotificationPermission(final NotifyEvent p_ntfy) {
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                mNtfyExternalStoragePermission = p_ntfy;
+                requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_PERMISSIONS_POST_NOTIFICATIONS);
+                return;
+            }
+        }
+        checkExactAlarmPermission(p_ntfy);
     }
 
     private void checkExactAlarmPermission(final NotifyEvent p_ntfy) {
@@ -2569,7 +2583,7 @@ public class ActivityMain extends AppCompatActivity {
                 mUiHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        if (mNtfyExternalStoragePermission != null) checkExactAlarmPermission(mNtfyExternalStoragePermission);
+                        if (mNtfyExternalStoragePermission != null) checkNotificationPermission(mNtfyExternalStoragePermission);
                     }
                 }, 500);
             } else {
@@ -2588,6 +2602,13 @@ public class ActivityMain extends AppCompatActivity {
                         mContext.getString(R.string.msgs_main_permission_external_storage_title),
                         mContext.getString(R.string.msgs_main_permission_external_storage_denied_msg), ntfy_term);
             }
+        } else if (REQUEST_PERMISSIONS_POST_NOTIFICATIONS == requestCode) {
+            mUiHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (mNtfyExternalStoragePermission != null) checkExactAlarmPermission(mNtfyExternalStoragePermission);
+                }
+            }, 200);
         }
     }
 
@@ -2653,6 +2674,32 @@ public class ActivityMain extends AppCompatActivity {
             reloadSettingParms();
             if (mGp.syncTaskAdapter.isShowCheckBox()) setSyncTaskContextButtonSelectMode();
             else setSyncTaskContextButtonNormalMode();
+        } else if (requestCode == ACTIVITY_REQUEST_CODE_ALL_FILES_ACCESS) {
+            mUtil.addDebugMsg(1, "I", "Return from All Files Access Settings.");
+            if (Build.VERSION.SDK_INT >= 30 && Environment.isExternalStorageManager()) {
+                mGp.initStorageStatus(mContext);
+                mUiHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mNtfyExternalStoragePermission != null) checkNotificationPermission(mNtfyExternalStoragePermission);
+                    }
+                }, 300);
+            } else {
+                NotifyEvent ntfy_term = new NotifyEvent(mContext);
+                ntfy_term.setListener(new NotifyEventListener() {
+                    @Override
+                    public void positiveResponse(Context c, Object[] o) {
+                        isTaskTermination = true;
+                        finish();
+                    }
+
+                    @Override
+                    public void negativeResponse(Context c, Object[] o) {}
+                });
+                mUtil.showCommonDialog(false, "W",
+                        mContext.getString(R.string.msgs_main_permission_all_files_access_title),
+                        mContext.getString(R.string.msgs_main_permission_all_files_access_denied_msg), ntfy_term);
+            }
         } else if (requestCode == (ACTIVITY_REQUEST_CODE_SDCARD_STORAGE_ACCESS + 1)) {
             mUtil.addDebugMsg(1, "I", "Return from Storage Picker. id=" + requestCode);
         } else if (requestCode == ACTIVITY_REQUEST_CODE_SDCARD_STORAGE_ACCESS) {

@@ -56,8 +56,51 @@ public class NotificationUtil {
 
     static final public void initNotification(GlobalParameters gwa, CommonUtilities util, Context c) {
         gwa.notificationManager = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
-        gwa.notification = new Notification(R.drawable.ic_48_smbsync_wait,
-                c.getString(R.string.app_name), 0);
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel def_ch = new NotificationChannel(
+                    NOTIFICATION_CHANNEL_DEFAULT,
+                    NOTIFICATION_CHANNEL_DEFAULT,
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            def_ch.enableLights(false);
+            def_ch.setSound(null, null);
+            def_ch.enableVibration(false);
+            def_ch.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            gwa.notificationManager.createNotificationChannel(def_ch);
+
+            NotificationChannel sound_ch = new NotificationChannel(
+                    NOTIFICATION_CHANNEL_SOUND,
+                    NOTIFICATION_CHANNEL_SOUND,
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            sound_ch.enableLights(false);
+            sound_ch.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), null);
+            sound_ch.enableVibration(false);
+            sound_ch.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            gwa.notificationManager.createNotificationChannel(sound_ch);
+
+            NotificationChannel vibrate_ch = new NotificationChannel(
+                    NOTIFICATION_CHANNEL_VIBRATE,
+                    NOTIFICATION_CHANNEL_VIBRATE,
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            vibrate_ch.enableLights(false);
+            vibrate_ch.setSound(null, null);
+            vibrate_ch.enableVibration(true);
+            vibrate_ch.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            gwa.notificationManager.createNotificationChannel(vibrate_ch);
+
+            NotificationChannel vibrate_sound_ch = new NotificationChannel(
+                    NOTIFICATION_CHANNEL_BOTH,
+                    NOTIFICATION_CHANNEL_BOTH,
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            vibrate_sound_ch.enableLights(false);
+            vibrate_sound_ch.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), null);
+            vibrate_sound_ch.enableVibration(true);
+            vibrate_sound_ch.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            gwa.notificationManager.createNotificationChannel(vibrate_sound_ch);
+        }
 
         gwa.notificationAppName = c.getString(R.string.app_name);
 
@@ -69,7 +112,7 @@ public class NotificationUtil {
         gwa.notificationPendingIntent = PendingIntent.getActivity(c, 0, gwa.notificationIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 //        gwa.notificationLargeIcon = BitmapFactory.decodeResource(c.getResources(), gwa.notificationSmallIcon);
-        gwa.notificationBuilder = new NotificationCompat.Builder(c);
+        gwa.notificationBuilder = new NotificationCompat.Builder(c, NOTIFICATION_CHANNEL_DEFAULT);
         gwa.notificationBuilder.setContentIntent(gwa.notificationPendingIntent)
                 .setOngoing(true)
                 .setAutoCancel(false)
@@ -78,7 +121,7 @@ public class NotificationUtil {
                 .setContentText("")
                 .setWhen(0)
         ;
-        if (Build.VERSION.SDK_INT>=26) {
+        if (Build.VERSION.SDK_INT >= 26) {
             gwa.notificationBuilder.setChannelId(NOTIFICATION_CHANNEL_DEFAULT);
         }
         gwa.notification = gwa.notificationBuilder.build();
@@ -87,57 +130,6 @@ public class NotificationUtil {
         gwa.notificationBigTextStyle
                 .setBigContentTitle(gwa.notificationLastShowedTitle)
                 .bigText(gwa.notificationLastShowedMessage);
-
-        if (Build.VERSION.SDK_INT>=26) {
-            NotificationChannel def_ch = new NotificationChannel(
-                    "SMBSync2",
-                    "SMBSync2",
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-            def_ch.enableLights(false);
-            def_ch.setSound(null,null);
-            def_ch.enableVibration(false);
-            def_ch.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
-            gwa.notificationManager.deleteNotificationChannel(NOTIFICATION_CHANNEL_DEFAULT);
-            gwa.notificationManager.createNotificationChannel(def_ch);
-
-            NotificationChannel sound_ch = new NotificationChannel(
-                    "Sound",
-                    "Sound",
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-            sound_ch.enableLights(false);
-            sound_ch.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), null);
-            sound_ch.enableVibration(false);
-            sound_ch.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
-            gwa.notificationManager.deleteNotificationChannel("Sound");
-            gwa.notificationManager.createNotificationChannel(sound_ch);
-
-            NotificationChannel vibrate_ch = new NotificationChannel(
-                    "Vibrate",
-                    "Vibrate",
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-            vibrate_ch.enableLights(false);
-            vibrate_ch.setSound(null, null);
-            vibrate_ch.enableVibration(true);
-            vibrate_ch.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
-            gwa.notificationManager.deleteNotificationChannel("Vibrate");
-            gwa.notificationManager.createNotificationChannel(vibrate_ch);
-
-            NotificationChannel vibrate_sound_ch = new NotificationChannel(
-                    "Vibrate_Sound",
-                    "Vibrate_Sound",
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-            vibrate_sound_ch.enableLights(false);
-            vibrate_sound_ch.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), null);
-            vibrate_sound_ch.enableVibration(true);
-            vibrate_sound_ch.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
-            gwa.notificationManager.deleteNotificationChannel(NOTIFICATION_CHANNEL_BOTH);
-            gwa.notificationManager.createNotificationChannel(vibrate_sound_ch);
-
-        }
 
     }
 
@@ -252,7 +244,11 @@ public class NotificationUtil {
 
     final static public void showNoticeMsg(Context c, GlobalParameters gwa, CommonUtilities util, String msg, boolean playback_sound, boolean vibration) {
         clearNotification(gwa, util);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(c);
+        String ch_id = NOTIFICATION_CHANNEL_DEFAULT;
+        if (playback_sound && vibration) ch_id = NOTIFICATION_CHANNEL_BOTH;
+        else if (playback_sound && !vibration) ch_id = NOTIFICATION_CHANNEL_SOUND;
+        else if (!playback_sound && vibration) ch_id = NOTIFICATION_CHANNEL_VIBRATE;
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(c, ch_id);
         builder.setOngoing(false)
                 .setAutoCancel(true)
                 .setSmallIcon(gwa.notificationSmallIcon)//smbsync_animation)
@@ -264,10 +260,7 @@ public class NotificationUtil {
         if (playback_sound) builder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
         if (vibration) builder.setVibrate(new long[]{0, 300, 200, 300});
         if (Build.VERSION.SDK_INT>=26) {
-            if (playback_sound && vibration) builder.setChannelId(NOTIFICATION_CHANNEL_BOTH);
-            else if (playback_sound && !vibration) builder.setChannelId(NOTIFICATION_CHANNEL_SOUND);
-            else if (!playback_sound && vibration) builder.setChannelId(NOTIFICATION_CHANNEL_VIBRATE);
-            else builder.setChannelId(NOTIFICATION_CHANNEL_DEFAULT);
+            builder.setChannelId(ch_id);
         }
         if (gwa.callbackStub != null || (gwa.syncMessageList != null && gwa.syncMessageList.size() > 0)) {
             Intent activity_intent = new Intent(c, ActivityMain.class);

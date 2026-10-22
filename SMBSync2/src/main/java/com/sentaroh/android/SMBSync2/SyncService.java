@@ -115,7 +115,11 @@ public class SyncService extends Service {
         int_filter.addAction(Intent.ACTION_SCREEN_OFF);
         int_filter.addAction(Intent.ACTION_SCREEN_ON);
         int_filter.addAction(Intent.ACTION_USER_PRESENT);
-        registerReceiver(mSleepReceiver, int_filter);
+        if (Build.VERSION.SDK_INT >= 33) {
+            registerReceiver(mSleepReceiver, int_filter, Context.RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(mSleepReceiver, int_filter);
+        }
 
         IntentFilter media_filter = new IntentFilter();
         media_filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
@@ -123,7 +127,11 @@ public class SyncService extends Service {
         media_filter.addAction(Intent.ACTION_MEDIA_EJECT);
         media_filter.addAction(Intent.ACTION_MEDIA_REMOVED);
         media_filter.addDataScheme("file");
-        registerReceiver(mMediaStatusChangeReceiver, media_filter);
+        if (Build.VERSION.SDK_INT >= 33) {
+            registerReceiver(mMediaStatusChangeReceiver, media_filter, Context.RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(mMediaStatusChangeReceiver, media_filter);
+        }
 
     }
 
@@ -214,11 +222,27 @@ public class SyncService extends Service {
     private void startForegroundCompat() {
         if (!mStartForegroundActive) {
             mStartForegroundActive =true;
-            startForeground(R.string.app_name, mGp.notification);
-            mUtil.addDebugMsg(1, "I", "startForeground(R.string.app_name, mGp.notification) issued.");
+            try {
+                if (Build.VERSION.SDK_INT >= 29) {
+                    startForeground(R.string.app_name, mGp.notification, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+                } else {
+                    startForeground(R.string.app_name, mGp.notification);
+                }
+                mUtil.addDebugMsg(1, "I", "startForeground(R.string.app_name, mGp.notification) issued.");
+            } catch (Exception e) {
+                mStartForegroundActive = false;
+                mUtil.addDebugMsg(1, "E", "startForeground failed: " + e.getMessage());
+            }
         } else {
             mUtil.addDebugMsg(1, "I", "startForeground() already issued.");
         }
+    }
+
+    @Override
+    public void onTimeout(int startId, int fgsType) {
+        mUtil.addLogMsg("W", "Foreground service timeout reached (Android 15+ dataSync limit). Stopping foreground state.");
+        stopForegroundCompat();
+        stopSelf(startId);
     }
 
     @Override
