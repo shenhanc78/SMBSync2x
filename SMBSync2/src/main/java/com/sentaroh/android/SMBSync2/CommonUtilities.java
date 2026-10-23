@@ -242,12 +242,12 @@ public final class CommonUtilities {
 
     final public static String getWifiSsidName(WifiManager wm) {
         String wssid = "";
-//        if (wm.isWifiEnabled()) {
-//            String tssid = wm.getConnectionInfo().getSSID();
-//            if (tssid == null || tssid.equals("<unknown ssid>")) wssid = "";
-//            else wssid = tssid.replaceAll("\"", "");
-//            if (wssid.equals("0x")) wssid = "";
-//        }
+        if (wm.isWifiEnabled()) {
+            String tssid = wm.getConnectionInfo().getSSID();
+            if (tssid == null || tssid.equals("<unknown ssid>")) wssid = "";
+            else wssid = tssid.replaceAll("\"", "");
+            if (wssid.equals("0x")) wssid = "";
+        }
         return wssid;
     }
 

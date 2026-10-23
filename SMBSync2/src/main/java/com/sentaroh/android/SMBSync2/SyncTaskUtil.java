@@ -2615,7 +2615,6 @@ public class SyncTaskUtil {
         th.start();
     }
 
-/*
     public void editWifiAccessPointListDlg(final ArrayList<String> ap_list, final NotifyEvent p_ntfy) {
         ArrayList<AdapterFilterList.FilterListItem> filterList = new ArrayList<AdapterFilterList.FilterListItem>();
         final AdapterFilterList filterAdapter;
@@ -2802,10 +2801,12 @@ public class SyncTaskUtil {
                 ap_list.clear();
                 if (filterAdapter.getCount() > 0) {
                     for (int i = 0; i < filterAdapter.getCount(); i++) {
-                        String inc = SMBSYNC2_PROF_FILTER_EXCLUDE;
-                        if (filterAdapter.getItem(i).isInclude())
-                            inc = SMBSYNC2_PROF_FILTER_INCLUDE;
-                        ap_list.add(inc + filterAdapter.getItem(i).getFilter());
+                        if (!filterAdapter.getItem(i).isDeleted()) {
+                            String inc = SMBSYNC2_PROF_FILTER_EXCLUDE;
+                            if (filterAdapter.getItem(i).isInclude())
+                                inc = SMBSYNC2_PROF_FILTER_INCLUDE;
+                            ap_list.add(inc + filterAdapter.getItem(i).getFilter());
+                        }
                     }
                 }
                 p_ntfy.notifyToListener(true, null);
@@ -2816,7 +2817,6 @@ public class SyncTaskUtil {
         dialog.show();
 
     }
-*/
 
     public void editWifiIPAddressListDlg(final ArrayList<String> addr_list, final NotifyEvent p_ntfy) {
         ArrayList<AdapterFilterList.FilterListItem> filterList = new ArrayList<AdapterFilterList.FilterListItem>();
@@ -7320,13 +7320,6 @@ public class SyncTaskUtil {
                 putTaskListValueErrorMessage(util, "WiFi status option", SyncTaskItem.SYNC_WIFI_STATUS_WIFI_DEFAULT_DESCRIPTION);
             }
 
-            //Set SyncTask to error state if Wifi AP option is set from previous versions
-            if (stli.getSyncOptionWifiStatusOption().equals(SyncTaskItem.SYNC_WIFI_STATUS_WIFI_CONNECT_SPECIFIC_AP)) {
-                if (stli.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SMB) || stli.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SMB)) {
-                    stli.setSyncTaskWifiOptionError(true);
-                }
-            }
-
             stli.setLastSyncTime(parm[38]);
             try {
                 if (isValidTaskItemValue(SyncTaskItem.SYNC_STATUS_LIST, Integer.parseInt(parm[39]))) {
@@ -7752,13 +7745,6 @@ public class SyncTaskUtil {
             } catch(Exception e) {
                 stli.setSyncOptionWifiStatusOption(SyncTaskItem.SYNC_WIFI_STATUS_WIFI_DEFAULT );
                 putTaskListValueErrorMessage(util, "WiFi status option", SyncTaskItem.SYNC_WIFI_STATUS_WIFI_DEFAULT_DESCRIPTION);
-            }
-
-            //Set SyncTask to error state if Wifi AP option is set from previous versions
-            if (stli.getSyncOptionWifiStatusOption().equals(SyncTaskItem.SYNC_WIFI_STATUS_WIFI_CONNECT_SPECIFIC_AP)) {
-                if (stli.getMasterFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SMB) || stli.getTargetFolderType().equals(SyncTaskItem.SYNC_FOLDER_TYPE_SMB)) {
-                    stli.setSyncTaskWifiOptionError(true);
-                }
             }
 
             stli.setLastSyncTime(parm[38]);

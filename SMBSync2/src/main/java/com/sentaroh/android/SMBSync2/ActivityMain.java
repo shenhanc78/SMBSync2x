@@ -2441,7 +2441,10 @@ public class ActivityMain extends AppCompatActivity {
 
     private final int REQUEST_PERMISSIONS_WRITE_EXTERNAL_STORAGE = 1;
     private final int REQUEST_PERMISSIONS_POST_NOTIFICATIONS = 2;
+    private final int REQUEST_PERMISSIONS_LOCATION = 3;
+    private final int REQUEST_PERMISSIONS_BACKGROUND_LOCATION = 4;
     private final int ACTIVITY_REQUEST_CODE_ALL_FILES_ACCESS = 60;
+    private final int ACTIVITY_REQUEST_CODE_LOCATION_SETTINGS = 61;
 
     private NotifyEvent mNtfyExternalStoragePermission=null;
     private void checkRequiredPermissions(final NotifyEvent p_ntfy) {
@@ -2557,12 +2560,12 @@ public class ActivityMain extends AppCompatActivity {
                             mUtil.addDebugMsg(1, "E", "Failed to launch exact alarm settings: " + e.getMessage());
                         }
                         // Proceed regardless to not hard block the application on older devices
-                        if (p_ntfy != null) p_ntfy.notifyToListener(true, null);
+                        checkLocationPermission(p_ntfy);
                     }
 
                     @Override
                     public void negativeResponse(Context c, Object[] o) {
-                        if (p_ntfy != null) p_ntfy.notifyToListener(true, null);
+                        checkLocationPermission(p_ntfy);
                     }
                 });
                 mUtil.showCommonDialog(false, "W",
@@ -2572,7 +2575,86 @@ public class ActivityMain extends AppCompatActivity {
                 return;
             }
         }
+        checkLocationPermission(p_ntfy);
+    }
+
+    private void checkLocationPermission(final NotifyEvent p_ntfy) {
+        if (Build.VERSION.SDK_INT >= 27) {
+            if (Build.VERSION.SDK_INT >= 29) {
+                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    NotifyEvent ntfy = new NotifyEvent(mContext);
+                    ntfy.setListener(new NotifyEventListener() {
+                        @Override
+                        public void positiveResponse(Context c, Object[] o) {
+                            mNtfyExternalStoragePermission = p_ntfy;
+                            requestPermissions(new String[]{
+                                    Manifest.permission.ACCESS_FINE_LOCATION,
+                                    Manifest.permission.ACCESS_COARSE_LOCATION
+                            }, REQUEST_PERMISSIONS_LOCATION);
+                        }
+
+                        @Override
+                        public void negativeResponse(Context c, Object[] o) {
+                            if (p_ntfy != null) p_ntfy.notifyToListener(true, null);
+                        }
+                    });
+                    mUtil.showCommonDialog(true, "W",
+                            "Location Permission Required for Wi-Fi SSID",
+                            "Android requires Location permission ('Allow all the time' and Precise location) to read the connected Wi-Fi network name (SSID) for Wi-Fi whitelist filtering.\n\nPress OK to grant location permission.",
+                            ntfy);
+                    return;
+                } else if (checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    checkBackgroundLocationPermission(p_ntfy);
+                    return;
+                }
+            } else {
+                if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    mNtfyExternalStoragePermission = p_ntfy;
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PERMISSIONS_LOCATION);
+                    return;
+                }
+            }
+        }
         if (p_ntfy != null) p_ntfy.notifyToListener(true, null);
+    }
+
+    private void checkBackgroundLocationPermission(final NotifyEvent p_ntfy) {
+        if (Build.VERSION.SDK_INT >= 29 && checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            NotifyEvent ntfy = new NotifyEvent(mContext);
+            ntfy.setListener(new NotifyEventListener() {
+                @Override
+                public void positiveResponse(Context c, Object[] o) {
+                    mNtfyExternalStoragePermission = p_ntfy;
+                    if (Build.VERSION.SDK_INT >= 30) {
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, REQUEST_PERMISSIONS_BACKGROUND_LOCATION);
+                    } else {
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, REQUEST_PERMISSIONS_BACKGROUND_LOCATION);
+                    }
+                }
+
+                @Override
+                public void negativeResponse(Context c, Object[] o) {
+                    if (p_ntfy != null) p_ntfy.notifyToListener(true, null);
+                }
+            });
+            mUtil.showCommonDialog(true, "W",
+                    "Background Location Permission ('Allow all the time')",
+                    "To verify the Wi-Fi SSID during scheduled/background sync jobs, please select 'Allow all the time' on the next screen.",
+                    ntfy);
+            return;
+        }
+        if (p_ntfy != null) p_ntfy.notifyToListener(true, null);
+    }
+
+    private void openAppDetailsSettingsForLocation(final NotifyEvent p_ntfy) {
+        try {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.setData(Uri.fromParts("package", getPackageName(), null));
+            startActivityForResult(intent, ACTIVITY_REQUEST_CODE_LOCATION_SETTINGS);
+        } catch (Exception e) {
+            mUtil.addDebugMsg(1, "E", "Failed to open app details settings: " + e.getMessage());
+            if (p_ntfy != null) p_ntfy.notifyToListener(true, null);
+        }
     }
 
     @Override
@@ -2608,6 +2690,66 @@ public class ActivityMain extends AppCompatActivity {
                 @Override
                 public void run() {
                     if (mNtfyExternalStoragePermission != null) checkExactAlarmPermission(mNtfyExternalStoragePermission);
+                }
+            }, 200);
+        } else if (REQUEST_PERMISSIONS_LOCATION == requestCode) {
+            mUiHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (Build.VERSION.SDK_INT >= 29) {
+                        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                            if (checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                checkBackgroundLocationPermission(mNtfyExternalStoragePermission);
+                                return;
+                            }
+                        } else {
+                            // User denied or only granted coarse location; offer to open App Settings
+                            NotifyEvent ntfy = new NotifyEvent(mContext);
+                            ntfy.setListener(new NotifyEventListener() {
+                                @Override
+                                public void positiveResponse(Context c, Object[] o) {
+                                    openAppDetailsSettingsForLocation(mNtfyExternalStoragePermission);
+                                }
+
+                                @Override
+                                public void negativeResponse(Context c, Object[] o) {
+                                    if (mNtfyExternalStoragePermission != null) mNtfyExternalStoragePermission.notifyToListener(true, null);
+                                }
+                            });
+                            mUtil.showCommonDialog(true, "W",
+                                    "Location Permission Setup",
+                                    "Precise Location ('Allow all the time') was not granted. Would you like to open App Settings -> Permissions -> Location to enable it?",
+                                    ntfy);
+                            return;
+                        }
+                    }
+                    if (mNtfyExternalStoragePermission != null) mNtfyExternalStoragePermission.notifyToListener(true, null);
+                }
+            }, 200);
+        } else if (REQUEST_PERMISSIONS_BACKGROUND_LOCATION == requestCode) {
+            mUiHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (Build.VERSION.SDK_INT >= 29 && checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        NotifyEvent ntfy = new NotifyEvent(mContext);
+                        ntfy.setListener(new NotifyEventListener() {
+                            @Override
+                            public void positiveResponse(Context c, Object[] o) {
+                                openAppDetailsSettingsForLocation(mNtfyExternalStoragePermission);
+                            }
+
+                            @Override
+                            public void negativeResponse(Context c, Object[] o) {
+                                if (mNtfyExternalStoragePermission != null) mNtfyExternalStoragePermission.notifyToListener(true, null);
+                            }
+                        });
+                        mUtil.showCommonDialog(true, "W",
+                                "Location Permission Setup",
+                                "Background Location ('Allow all the time') was not enabled. Would you like to open App Settings -> Permissions -> Location to set it to 'Allow all the time'?",
+                                ntfy);
+                        return;
+                    }
+                    if (mNtfyExternalStoragePermission != null) mNtfyExternalStoragePermission.notifyToListener(true, null);
                 }
             }, 200);
         }
@@ -2700,6 +2842,11 @@ public class ActivityMain extends AppCompatActivity {
                 mUtil.showCommonDialog(false, "W",
                         mContext.getString(R.string.msgs_main_permission_all_files_access_title),
                         mContext.getString(R.string.msgs_main_permission_all_files_access_denied_msg), ntfy_term);
+            }
+        } else if (requestCode == ACTIVITY_REQUEST_CODE_LOCATION_SETTINGS) {
+            mUtil.addDebugMsg(1, "I", "Return from Location App Details Settings.");
+            if (mNtfyExternalStoragePermission != null) {
+                mNtfyExternalStoragePermission.notifyToListener(true, null);
             }
         } else if (requestCode == (ACTIVITY_REQUEST_CODE_SDCARD_STORAGE_ACCESS + 1)) {
             mUtil.addDebugMsg(1, "I", "Return from Storage Picker. id=" + requestCode);
