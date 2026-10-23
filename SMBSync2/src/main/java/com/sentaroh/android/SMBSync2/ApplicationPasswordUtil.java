@@ -117,7 +117,7 @@ public class ApplicationPasswordUtil {
 
         final Dialog dialog = new Dialog(mActivity, gp.applicationTheme);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         dialog.setContentView(R.layout.password_input_dlg);
 
         LinearLayout ll_view = (LinearLayout) dialog.findViewById(R.id.password_input_dlg_view);
@@ -233,7 +233,7 @@ public class ApplicationPasswordUtil {
                                                   final CommonUtilities mUtil, final String title, final NotifyEvent ntfy_create) {
         final Dialog dialog = new Dialog(mActivity, gp.applicationTheme);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         dialog.setContentView(R.layout.password_input_dlg);
 
         LinearLayout ll_view = (LinearLayout) dialog.findViewById(R.id.password_input_dlg_view);

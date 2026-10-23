@@ -37,7 +37,8 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -275,14 +276,21 @@ public final class CommonUtilities {
             }
 
             ConnectivityManager cm =(ConnectivityManager)c.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-            if (activeNetwork!=null) {
-                String network=activeNetwork.getExtraInfo();
-
-                boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-                boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
-
-                out.add("   Network="+network+", isConnected="+isConnected+", isWiFi="+isWiFi);
+            Network activeNetwork = cm != null ? cm.getActiveNetwork() : null;
+            NetworkCapabilities nc = (cm != null && activeNetwork != null) ? cm.getNetworkCapabilities(activeNetwork) : null;
+            if (nc != null) {
+                boolean isConnected = true;
+                boolean isWiFi = nc.hasTransport(NetworkCapabilities.TRANSPORT_WIFI);
+                if (!isWiFi) {
+                    for (Network net : cm.getAllNetworks()) {
+                        NetworkCapabilities netCap = cm.getNetworkCapabilities(net);
+                        if (netCap != null && netCap.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                            isWiFi = true;
+                            break;
+                        }
+                    }
+                }
+                out.add("   Network="+activeNetwork.toString()+", isConnected="+isConnected+", isWiFi="+isWiFi);
             } else {
                 out.add("   No active network");
             }
@@ -356,9 +364,15 @@ public final class CommonUtilities {
 
     final public static boolean isNetworkConnected(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo ni = cm.getActiveNetworkInfo();
-        if (ni != null) {
-            return cm.getActiveNetworkInfo().isConnected();
+        if (cm != null) {
+            Network activeNetwork = cm.getActiveNetwork();
+            if (activeNetwork != null) {
+                NetworkCapabilities nc = cm.getNetworkCapabilities(activeNetwork);
+                return nc != null && (nc.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                        || nc.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+                        || nc.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+                        || nc.hasTransport(NetworkCapabilities.TRANSPORT_VPN));
+            }
         }
         return false;
     }

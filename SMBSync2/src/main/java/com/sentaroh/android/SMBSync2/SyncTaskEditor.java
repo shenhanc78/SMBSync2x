@@ -191,8 +191,8 @@ public class SyncTaskEditor extends DialogFragment {
         setRetainInstance(true);
         if (mContext == null) mContext = this.getActivity();
         mFragment = this;
-        mFragMgr = this.getFragmentManager();
-        if (mUtil == null) mUtil = new CommonUtilities(mContext, "SyncTaskEditor", mGp, getFragmentManager());
+        mFragMgr = this.getParentFragmentManager();
+        if (mUtil == null) mUtil = new CommonUtilities(mContext, "SyncTaskEditor", mGp, getParentFragmentManager());
         mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " entered");
         mCommonDlg = new com.sentaroh.android.Utilities.Dialog.CommonDialog(mContext, getActivity().getSupportFragmentManager());
         if (mTerminateRequired) {
@@ -201,17 +201,11 @@ public class SyncTaskEditor extends DialogFragment {
     }
 
     @Override
-    final public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " entered");
-    }
-
-    @Override
-    final public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (mContext == null) mContext = this.getActivity();
+    final public void onAttach(Context context) {
+        super.onAttach(context);
+        if (mContext == null) mContext = context;
         mGp=GlobalWorkArea.getGlobalParameters(mContext);
-        if (mUtil == null) mUtil = new CommonUtilities(mContext, "SyncTaskEditor", mGp, getFragmentManager());
+        if (mUtil == null) mUtil = new CommonUtilities(mContext, "SyncTaskEditor", mGp, getParentFragmentManager());
         mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " entered");
     }
 
@@ -5317,7 +5311,7 @@ public class SyncTaskEditor extends DialogFragment {
 
         dlg_wb.setWebViewClient(new WebViewClient() {
             @Override
-            public boolean shouldOverrideUrlLoading (WebView view, String url) {
+            public boolean shouldOverrideUrlLoading (WebView view, android.webkit.WebResourceRequest request) {
                 return false;
             }
         });

@@ -32,7 +32,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiManager;
@@ -2231,21 +2232,19 @@ public class SyncThread extends Thread {
     }
 
     private boolean isConnectedToAnyWifiAP() {
-        boolean isConnected = false;
-        boolean isWiFi = false;
-        boolean result=true;
-        ConnectivityManager cm =(ConnectivityManager)mStwa.context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        if (activeNetwork!=null) {
-            String network=activeNetwork.getExtraInfo();
-            isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-            isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
+        ConnectivityManager cm = (ConnectivityManager) mStwa.context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            Network[] networks = cm.getAllNetworks();
+            if (networks != null) {
+                for (Network network : networks) {
+                    NetworkCapabilities nc = cm.getNetworkCapabilities(network);
+                    if (nc != null && nc.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                        return true;
+                    }
+                }
+            }
         }
-        if (!isWiFi || !isConnected) {//getWifiConnectedAP().equals("")) {
-            result=false;
-        }
-
-        return result;
+        return false;
     }
 
     private boolean isWifiOn() {
