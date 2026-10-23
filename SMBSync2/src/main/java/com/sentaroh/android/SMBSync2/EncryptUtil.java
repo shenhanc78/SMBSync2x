@@ -31,6 +31,7 @@ public class EncryptUtil {
             CipherParms cp = new CipherParms();
             cp.keySpec = deriveKey(password);
             cp.encryptCipher = Cipher.getInstance(TRANSFORMATION);
+            cp.decryptCipher = Cipher.getInstance(TRANSFORMATION);
             return cp;
         } catch (Exception e) {
             e.printStackTrace();
@@ -42,6 +43,7 @@ public class EncryptUtil {
         try {
             CipherParms cp = new CipherParms();
             cp.keySpec = deriveKey(password);
+            cp.encryptCipher = Cipher.getInstance(TRANSFORMATION);
             cp.decryptCipher = Cipher.getInstance(TRANSFORMATION);
             return cp;
         } catch (Exception e) {
