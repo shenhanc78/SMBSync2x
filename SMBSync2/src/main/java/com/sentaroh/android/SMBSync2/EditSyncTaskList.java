@@ -158,8 +158,8 @@ public class EditSyncTaskList {
 
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                final int fromPos = viewHolder.getAdapterPosition();
-                final int toPos = target.getAdapterPosition();
+                final int fromPos = viewHolder.getBindingAdapterPosition();
+                final int toPos = target.getBindingAdapterPosition();
                 DataListItem fromTask=mEditDataList.get(fromPos);
                 data_list_adapter.notifyItemMoved(fromPos, toPos);
                 mEditDataList.remove(fromPos);

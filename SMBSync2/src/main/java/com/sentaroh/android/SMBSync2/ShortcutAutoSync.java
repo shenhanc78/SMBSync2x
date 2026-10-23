@@ -23,13 +23,13 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import androidx.fragment.app.FragmentActivity;
 import android.view.Window;
 
@@ -173,7 +173,7 @@ public class ShortcutAutoSync extends FragmentActivity {
     }
 
     private void terminateShortcut() {
-        Handler hndl = new Handler();
+        Handler hndl = new Handler(Looper.getMainLooper());
         hndl.postDelayed(new Runnable() {
             @Override
             public void run() {

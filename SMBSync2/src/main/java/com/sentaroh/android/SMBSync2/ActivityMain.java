@@ -45,6 +45,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.os.StrictMode;
 import android.os.storage.StorageVolume;
@@ -54,7 +55,7 @@ import androidx.core.content.FileProvider;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import android.text.ClipboardManager;
+import android.content.ClipboardManager;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -187,7 +188,7 @@ public class ActivityMain extends AppCompatActivity {
 
     private ServiceConnection mSvcConnection = null;
     private com.sentaroh.android.Utilities.Dialog.CommonDialog mCommonDlg = null;
-    private Handler mUiHandler = new Handler();
+    private Handler mUiHandler = new Handler(Looper.getMainLooper());
 
     private ActionBar mActionBar = null;
 
@@ -1147,7 +1148,7 @@ public class ActivityMain extends AppCompatActivity {
         mMainViewPager = (CustomViewPager) findViewById(R.id.main_screen_pager);
         mMainViewPager.setAdapter(adapter);
         mMainViewPager.setOffscreenPageLimit(tab_view.length);
-        mMainViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        mMainViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 mUtil.addDebugMsg(2,"I","onPageSelected entered, pos="+position);
@@ -1169,7 +1170,7 @@ public class ActivityMain extends AppCompatActivity {
         mMainTabLayout.getTabAt(0).select();
         mMainViewPager.setCurrentItem(0);
 
-        mMainTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        mMainTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 String tabId=(String)tab.getTag();
@@ -1233,7 +1234,7 @@ public class ActivityMain extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_top, menu);
 
-        new Handler().post(new Runnable() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
                 //display toast info message for top action sync button
@@ -2115,7 +2116,7 @@ public class ActivityMain extends AppCompatActivity {
         viewPager.setAdapter(adapter);
         viewPager.setOffscreenPageLimit(3);
         viewPager.setSwipeEnabled(false);
-        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener(){
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener(){
             @Override
             public void onPageSelected(int position) {
 //                mUtil.addDebugMsg(2,"I","onPageSelected entered, pos="+position);
@@ -2133,7 +2134,7 @@ public class ActivityMain extends AppCompatActivity {
             }
         });
 
-        tab_layout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
+        tab_layout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
 //                mUtil.addDebugMsg(2,"I","onTabSelected entered, state="+tab);
@@ -2174,7 +2175,7 @@ public class ActivityMain extends AppCompatActivity {
     }
 
     private void loadHelpFile(final WebView web_view, String fn) {
-        final Handler hndl=new Handler();
+        final Handler hndl=new Handler(Looper.getMainLooper());
         Thread th1=new Thread(){
             @Override
             public void run() {
@@ -2267,7 +2268,7 @@ public class ActivityMain extends AppCompatActivity {
             public void negativeResponse(Context c, Object[] o) {
             }
         });
-        Handler hndl = new Handler();
+        Handler hndl = new Handler(Looper.getMainLooper());
         hndl.post(new Runnable() {
             @Override
             public void run() {
@@ -3866,7 +3867,7 @@ public class ActivityMain extends AppCompatActivity {
     }
 
     private void setHistoryScrollButtonVisibility() {
-        Handler hndl=new Handler();
+        Handler hndl=new Handler(Looper.getMainLooper());
         hndl.post(new Runnable(){
             @Override
             public void run() {
@@ -4054,7 +4055,7 @@ public class ActivityMain extends AppCompatActivity {
                             out.append("\n").append(hli.sync_error_text);
                         }
                     }
-                    if (out.length() > 0) cm.setText(out);
+                    if (out.length() > 0) cm.setPrimaryClip(ClipData.newPlainText(null, out));
                     if ((last_show_time + Toast.LENGTH_SHORT) < System.currentTimeMillis()) {
                         CommonUtilities.showToastMessageShort(mActivity, mContext.getString(R.string.msgs_main_sync_history_copy_completed));
                         last_show_time = System.currentTimeMillis();
@@ -5014,7 +5015,7 @@ public class ActivityMain extends AppCompatActivity {
     }
 
     private void setMessageScrollButtonVisibility() {
-        Handler hndl=new Handler();
+        Handler hndl=new Handler(Looper.getMainLooper());
         hndl.post(new Runnable(){
             @Override
             public void run() {
@@ -5814,7 +5815,7 @@ public class ActivityMain extends AppCompatActivity {
     final static private int DEFAULT_LONG_PRESS_REPEAT_INTERVAL = 100;
     private class RepeatListener implements View.OnTouchListener {
 
-        private Handler handler = new Handler();
+        private Handler handler = new Handler(Looper.getMainLooper());
 
         private final int mLongPressTimeout;
         private final int mRepeatInterval;

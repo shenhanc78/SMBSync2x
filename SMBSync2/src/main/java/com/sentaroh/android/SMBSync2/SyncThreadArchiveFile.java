@@ -53,6 +53,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import static com.sentaroh.android.SMBSync2.Constants.APP_SPECIFIC_DIRECTORY;
@@ -2275,7 +2276,7 @@ public class SyncThreadArchiveFile {
                     afli.date_from_exif=false;
                 } else {
 //                    Log.v("SMBSync2","name="+afli.file_name+", 0="+date_time[0]+", 1="+date_time[1]);
-                    date=new Date(date_time[0]+" "+date_time[1]);
+                    date=parseArchiveDateTime(date_time[0]+" "+date_time[1], element.lastModified());
                     String[] dt= StringUtil.convDateTimeTo_YearMonthDayHourMinSec(date.getTime()).split(" ");
                     afli.shoot_date=date_time[0].replace("/","-");
                     afli.shoot_time=date_time[1].replace(":","-");
@@ -2311,12 +2312,12 @@ public class SyncThreadArchiveFile {
                 Date date=null;
                 if (date_time==null || date_time[0]==null) {
                     String[] dt= StringUtil.convDateTimeTo_YearMonthDayHourMinSec(element.lastModified()).split(" ");
-                    date=new Date(dt[0]+" "+dt[1]);
+                    date=new Date(element.lastModified());
                     afli.shoot_date=dt[0].replace("/","-");
                     afli.shoot_time=dt[1].replace(":","-");
                     afli.date_from_exif=false;
                 } else {
-                    date=new Date(date_time[0]+" "+date_time[1]);
+                    date=parseArchiveDateTime(date_time[0]+" "+date_time[1], element.lastModified());
                     afli.shoot_date=date_time[0].replace("/","-");
                     afli.shoot_time=date_time[1].replace(":","-");
                 }
@@ -2360,12 +2361,12 @@ public class SyncThreadArchiveFile {
                 Date date=null;
                 if (date_time==null || date_time[0]==null) {
                     String[] dt= StringUtil.convDateTimeTo_YearMonthDayHourMinSec(element.getLastModified()).split(" ");
-                    date=new Date(dt[0]+" "+dt[1]);
+                    date=new Date(element.getLastModified());
                     afli.shoot_date=dt[0].replace("/","-");
                     afli.shoot_time=dt[1].replace(":","-");
                     afli.date_from_exif=false;
                 } else {
-                    date=new Date(date_time[0]+" "+date_time[1]);
+                    date=parseArchiveDateTime(date_time[0]+" "+date_time[1], element.getLastModified());
                     afli.shoot_date=date_time[0].replace("/","-");
                     afli.shoot_time=date_time[1].replace(":","-");
                 }
@@ -2385,6 +2386,17 @@ public class SyncThreadArchiveFile {
             }
         });
         return fl;
+    }
+
+    static private Date parseArchiveDateTime(String dateTimeStr, long fallbackMillis) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.US);
+            Date parsed = sdf.parse(dateTimeStr);
+            if (parsed != null) return parsed;
+        } catch (Exception e) {
+            // Fall back to fallbackMillis
+        }
+        return new Date(fallbackMillis);
     }
 
     static private String getWeekDay(long time) {
@@ -2417,7 +2429,6 @@ public class SyncThreadArchiveFile {
         else if (sti.getArchiveRetentionPeriod()==SyncTaskItem.PICTURE_ARCHIVE_RETAIN_FOR_A_90_DAYS) exp_time=day_mili*90L;
         else if (sti.getArchiveRetentionPeriod()==SyncTaskItem.PICTURE_ARCHIVE_RETAIN_FOR_A_180_DAYS) exp_time=day_mili*180L;
         else if (sti.getArchiveRetentionPeriod()==SyncTaskItem.PICTURE_ARCHIVE_RETAIN_FOR_A_1_YEARS) {
-            int n_year=cal.getTime().getYear();
             Calendar n_cal=Calendar.getInstance() ;
             n_cal.setTimeInMillis(cal.getTimeInMillis());
             n_cal.add(Calendar.YEAR, 1);

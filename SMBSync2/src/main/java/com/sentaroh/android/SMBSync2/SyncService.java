@@ -37,6 +37,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.RemoteException;
@@ -192,16 +193,11 @@ public class SyncService extends Service {
     }
 
     private void stopForegroundCompat() {
-        if (Build.VERSION.SDK_INT>=26) {
-            stopForeground(Service.STOP_FOREGROUND_DETACH);
-            SystemClock.sleep(50);
-            stopForeground(Service.STOP_FOREGROUND_REMOVE);
-            mGp.notificationManager.cancel(R.string.app_name);
-            mUtil.addDebugMsg(1, "I", "stopForeground(Service.STOP_FOREGROUND_DETACH&REMOVE) issued");
-        } else {
-            stopForeground(true);
-            mUtil.addDebugMsg(1, "I", "stopForeground(true) issued");
-        }
+        stopForeground(Service.STOP_FOREGROUND_DETACH);
+        SystemClock.sleep(50);
+        stopForeground(Service.STOP_FOREGROUND_REMOVE);
+        mGp.notificationManager.cancel(R.string.app_name);
+        mUtil.addDebugMsg(1, "I", "stopForeground(Service.STOP_FOREGROUND_DETACH&REMOVE) issued");
         mStartForegroundActive =false;
     }
 
@@ -265,7 +261,7 @@ public class SyncService extends Service {
             mGp.clearParms();
             System.gc();
 
-            Handler hndl = new Handler();
+            Handler hndl = new Handler(Looper.getMainLooper());
             hndl.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -276,7 +272,7 @@ public class SyncService extends Service {
             }, 200);
         } else {
             if (mGp.settingExitClean) {
-                Handler hndl = new Handler();
+                Handler hndl = new Handler(Looper.getMainLooper());
                 hndl.postDelayed(new Runnable() {
                     @Override
                     public void run() {

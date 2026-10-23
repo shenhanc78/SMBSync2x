@@ -31,6 +31,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.os.Vibrator;
 import android.view.Window;
@@ -55,7 +56,7 @@ public class ActivityNotification extends Activity {
             if (in.getBooleanExtra("VIBRATE",false)) vibrateDefaultPattern();
         }
 
-        Handler hndl = new Handler();
+        Handler hndl = new Handler(Looper.getMainLooper());
         hndl.postDelayed(new Runnable() {
             @Override
             public void run() {

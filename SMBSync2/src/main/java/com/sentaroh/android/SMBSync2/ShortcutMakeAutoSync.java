@@ -23,14 +23,13 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
+import android.graphics.drawable.Icon;
 import android.os.Bundle;
-import android.os.Parcelable;
 
 public class ShortcutMakeAutoSync extends Activity {
     private ShortcutMakeAutoSync mActivity=null;
@@ -52,40 +51,16 @@ public class ShortcutMakeAutoSync extends Activity {
         shortcutIntent.setClassName(mActivity, ShortcutAutoSync.class.getName());
         String shortcutName = getString(R.string.app_name_auto_sync);
 
-        if (Build.VERSION.SDK_INT >= 26) {
-            // Android 8 O API26 以降
-//            ShortcutManager shortcutManager = getSystemService(ShortcutManager.class);
-//            Icon icon = Icon.createWithResource(getApplicationContext(), R.drawable.auto_sync);
-//            ShortcutInfo shortcutInfo = new ShortcutInfo.Builder(getApplicationContext(), shortcutName)
-//                    .setShortLabel(shortcutName)
-//                    .setLongLabel(shortcutName)
-//                    .setIcon(icon)
-//                    .setIntent(shortcutIntent)
-//                    .build();
-//
-//            Intent shortcutResultIntent = shortcutManager.createShortcutResultIntent(shortcutInfo);
-//            PendingIntent shortcutCallBackIntent = PendingIntent.getBroadcast(this, 0,
-//                    shortcutResultIntent, 0);
-//            shortcutManager.requestPinShortcut(shortcutInfo, shortcutCallBackIntent.getIntentSender()); // フツーのショートカット
-            Intent intent = new Intent();
-            intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-            intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, shortcutName);
-            Parcelable iconResource =
-                    Intent.ShortcutIconResource.fromContext(mContext, R.drawable.auto_sync);
-            intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource);
-            intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
-            setResult(RESULT_OK, intent);
-        } else {
-            Intent intent = new Intent();
-            intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-            intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, shortcutName);
-            Parcelable iconResource =
-                    Intent.ShortcutIconResource.fromContext(mContext, R.drawable.auto_sync);
-            intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource);
-            intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
-            setResult(RESULT_OK, intent);
-            sendBroadcast(intent);
-        }
+        ShortcutManager shortcutManager = getSystemService(ShortcutManager.class);
+        Icon icon = Icon.createWithResource(getApplicationContext(), R.drawable.auto_sync);
+        ShortcutInfo shortcutInfo = new ShortcutInfo.Builder(getApplicationContext(), "auto_sync")
+                .setShortLabel(shortcutName)
+                .setLongLabel(shortcutName)
+                .setIcon(icon)
+                .setIntent(shortcutIntent)
+                .build();
+        Intent shortcutResultIntent = shortcutManager.createShortcutResultIntent(shortcutInfo);
+        setResult(RESULT_OK, shortcutResultIntent);
 
         finish();
     }

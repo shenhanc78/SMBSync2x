@@ -34,9 +34,10 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -87,6 +88,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -571,7 +573,7 @@ public class SyncTaskEditor extends DialogFragment {
         final Spinner sp_file_date_type=(Spinner)mDialog.findViewById(R.id.sync_filter_file_date_type_spinner);
         final EditText et_file_date_value=(EditText)mDialog.findViewById(R.id.sync_filter_file_date_value);
 
-        Handler hndl1 = new Handler();
+        Handler hndl1 = new Handler(Looper.getMainLooper());
         hndl1.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -668,7 +670,7 @@ public class SyncTaskEditor extends DialogFragment {
                 sp_file_date_type.setSelection(sv.file_filter_file_date_typ);
                 et_file_date_value.setText(sv.file_filter_file_date_value);
 
-                Handler hndl2 = new Handler();
+                Handler hndl2 = new Handler(Looper.getMainLooper());
                 hndl2.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -704,7 +706,7 @@ public class SyncTaskEditor extends DialogFragment {
 //            final int msg_visibility=dlg_msg.getVisibility();
 //            final CharSequence msg_text=dlg_msg.getText();
             editSyncFolder(true, mEditFolderSti, mEditFolderSfev, mEditFolderNotify);
-            Handler hndl=new Handler();
+            Handler hndl=new Handler(Looper.getMainLooper());
             hndl.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -1540,10 +1542,15 @@ public class SyncTaskEditor extends DialogFragment {
     }
 
     private void setWeekDayButtonLabel(Button short_button, Button long_button, String short_label, String long_label) {
-        String s_sunday=SyncThread.replaceKeywordValue(mGp, SMBSYNC2_REPLACEABLE_KEYWORD_WEEK_DAY, (new Date("2020/07/26").getTime()));
-        String s_monday=SyncThread.replaceKeywordValue(mGp, SMBSYNC2_REPLACEABLE_KEYWORD_WEEK_DAY, (new Date("2020/07/27").getTime()));
-        String l_sunday=SyncThread.replaceKeywordValue(mGp, SMBSYNC2_REPLACEABLE_KEYWORD_WEEK_DAY_LONG, (new Date("2020/07/26").getTime()));
-        String l_monday=SyncThread.replaceKeywordValue(mGp, SMBSYNC2_REPLACEABLE_KEYWORD_WEEK_DAY_LONG, (new Date("2020/07/27").getTime()));
+        Calendar cal = Calendar.getInstance();
+        cal.set(2020, Calendar.JULY, 26, 0, 0, 0);
+        long sundayTime = cal.getTimeInMillis();
+        cal.set(2020, Calendar.JULY, 27, 0, 0, 0);
+        long mondayTime = cal.getTimeInMillis();
+        String s_sunday=SyncThread.replaceKeywordValue(mGp, SMBSYNC2_REPLACEABLE_KEYWORD_WEEK_DAY, sundayTime);
+        String s_monday=SyncThread.replaceKeywordValue(mGp, SMBSYNC2_REPLACEABLE_KEYWORD_WEEK_DAY, mondayTime);
+        String l_sunday=SyncThread.replaceKeywordValue(mGp, SMBSYNC2_REPLACEABLE_KEYWORD_WEEK_DAY_LONG, sundayTime);
+        String l_monday=SyncThread.replaceKeywordValue(mGp, SMBSYNC2_REPLACEABLE_KEYWORD_WEEK_DAY_LONG, mondayTime);
 
         String new_short_label=String.format(short_label, s_sunday, s_monday);
         String new_long_label=String.format(long_label, l_sunday, l_monday);

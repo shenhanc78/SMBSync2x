@@ -137,7 +137,7 @@ public final class CommonUtilities {
     }
 
     final static public SharedPreferences getPrefMgr(Context c) {
-        return c.getSharedPreferences(DEFAULT_PREFS_FILENAME, Context.MODE_PRIVATE | Context.MODE_MULTI_PROCESS);
+        return c.getSharedPreferences(DEFAULT_PREFS_FILENAME, Context.MODE_PRIVATE);
     }
 
     public static ThemeColorList getThemeColorList(Context c) {

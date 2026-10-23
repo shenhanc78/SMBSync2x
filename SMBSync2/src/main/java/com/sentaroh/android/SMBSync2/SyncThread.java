@@ -39,7 +39,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.RemoteException;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
 
@@ -4415,16 +4415,16 @@ public class SyncThread extends Thread {
         BigDecimal dft2 = new BigDecimal(1000.000);
         BigDecimal dft = new BigDecimal("0.000000");
         dft = dft1.divide(dft2); // convert elapsed time from msec to sec
-        BigDecimal bd_tr1 = dfs.divide(dft, 6, BigDecimal.ROUND_HALF_UP); // transfer speed in bytes /sec
+        BigDecimal bd_tr1 = dfs.divide(dft, 6, RoundingMode.HALF_UP); // transfer speed in bytes /sec
 
         if (bd_tr1.compareTo(new BigDecimal(1048576)) >= 0) {//  MB/sec (transfer speed >= 1024 * 1024 bytes)
             units = " MBytes/sec";
             BigDecimal bd_tr2 = new BigDecimal(1024 * 1024 * 1.000000);
-            bd_tr = bd_tr1.divide(bd_tr2, 2, BigDecimal.ROUND_HALF_UP);
+            bd_tr = bd_tr1.divide(bd_tr2, 2, RoundingMode.HALF_UP);
         } else if (bd_tr1.compareTo(new BigDecimal(1024)) >= 0) { // KB/sec (transfer speed >= 1024 bytes)
             units = " KBytes/sec";
             BigDecimal bd_tr2 = new BigDecimal(1024 * 1.000000);
-            bd_tr = bd_tr1.divide(bd_tr2, 1, BigDecimal.ROUND_HALF_UP);
+            bd_tr = bd_tr1.divide(bd_tr2, 1, RoundingMode.HALF_UP);
         } else { // Bytes/sec
             units = " Bytes/sec";
             bd_tr = bd_tr1.setScale(0, RoundingMode.HALF_UP);

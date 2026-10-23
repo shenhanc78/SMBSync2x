@@ -29,6 +29,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import androidx.fragment.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -173,7 +174,7 @@ public class ApplicationPasswordUtil {
             @Override
             public void onClick(View view) {
                 btn_ok.setEnabled(false);
-                final Handler hndl=new Handler();
+                final Handler hndl=new Handler(Looper.getMainLooper());
                 String decrypted_hv="";
                 String input_hv="";
                 try {

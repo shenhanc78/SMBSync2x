@@ -43,9 +43,10 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.LocaleList;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat.BigTextStyle;
 import androidx.core.app.NotificationCompat.Builder;
@@ -339,7 +340,7 @@ public class GlobalParameters extends CommonGlobalParms {
 
     synchronized public void initGlobalParamter(Context c) {
 //		Log.v("","onCreate dir="+getFilesDir().toString());
-        uiHandler = new Handler();
+        uiHandler = new Handler(Looper.getMainLooper());
         debuggable = isDebuggable(c);
 
         mDimWakeLock = ((PowerManager) c.getSystemService(Context.POWER_SERVICE))
@@ -349,7 +350,11 @@ public class GlobalParameters extends CommonGlobalParms {
         mPartialWakeLock = ((PowerManager) c.getSystemService(Context.POWER_SERVICE))
                 .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "SMBSync2-thread-partial");
         WifiManager wm = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
-        mWifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "SMBSync2-thread");
+        if (Build.VERSION.SDK_INT >= 29) {
+            mWifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_LOW_LATENCY, "SMBSync2-thread");
+        } else {
+            mWifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "SMBSync2-thread");
+        }
 
         try {
             String fp=c.getExternalFilesDirs(null)[0].getPath();

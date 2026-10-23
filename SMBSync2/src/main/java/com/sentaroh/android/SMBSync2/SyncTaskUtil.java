@@ -34,8 +34,9 @@ import android.graphics.BitmapFactory;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import androidx.fragment.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -335,7 +336,7 @@ public class SyncTaskUtil {
             @Override
             public void onClick(View view) {
                 importSyncTaskListDlgWithFileSelection(p_ntfy);
-                Handler hndl=new Handler();
+                Handler hndl=new Handler(Looper.getMainLooper());
                 hndl.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -366,7 +367,7 @@ public class SyncTaskUtil {
                         }
                     }
                 }
-                Handler hndl=new Handler();
+                Handler hndl=new Handler(Looper.getMainLooper());
                 hndl.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -463,7 +464,7 @@ public class SyncTaskUtil {
             @Override
             public void positiveResponse(Context c, Object[] o) {
                 mGp.profilePassword = (String) o[0];
-                final Handler hndl=new Handler();
+                final Handler hndl=new Handler(Looper.getMainLooper());
                 Thread th=new Thread() {
                     @Override
                     public void run() {
@@ -613,7 +614,7 @@ public class SyncTaskUtil {
         });
 
         //OK button
-        final Handler hndl=new Handler();
+        final Handler hndl=new Handler(Looper.getMainLooper());
         btn_ok.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 String passwd = et_password.getText().toString();
@@ -1049,7 +1050,7 @@ public class SyncTaskUtil {
                 mGp.syncTaskListView.setSelection(0);
                 final Dialog pd=showProgressSpinIndicator(mActivity);
                 pd.show();
-                final Handler hndl=new Handler();
+                final Handler hndl=new Handler(Looper.getMainLooper());
                 Thread th=new Thread(){
                     @Override
                     public void run(){
@@ -2416,7 +2417,7 @@ public class SyncTaskUtil {
         setDlgBoxSizeCompactWithInput(dialog);
 
         setViewEnabled(mActivity, btnOk, false);
-        final Handler hndl=new Handler();
+        final Handler hndl=new Handler(Looper.getMainLooper());
         etDir.addTextChangedListener(new TextWatcher(){
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -5031,7 +5032,7 @@ public class SyncTaskUtil {
 //            final ArrayList<AdapterNetworkScanResult.NetworkScanListItem> ipAddressList,
             final String subnet, final int begin_addr, final int end_addr,
             final NotifyEvent p_ntfy, final int smb_protcol) {
-        final Handler handler = new Handler();
+        final Handler handler = new Handler(Looper.getMainLooper());
         final ThreadCtrl tc = new ThreadCtrl();
         final LinearLayout ll_addr = (LinearLayout) dialog.findViewById(R.id.scan_remote_ntwk_scan_address);
         final LinearLayout ll_prog = (LinearLayout) dialog.findViewById(R.id.scan_remote_ntwk_progress);
@@ -5429,7 +5430,7 @@ public class SyncTaskUtil {
         });
         pd.show();
 
-        final Handler hndl = new Handler();
+        final Handler hndl = new Handler(Looper.getMainLooper());
         Thread th=new Thread(){
           @Override
           public void run() {
@@ -5510,7 +5511,7 @@ public class SyncTaskUtil {
             }
         });
 
-        final Handler hndl = new Handler();
+        final Handler hndl = new Handler(Looper.getMainLooper());
         NotifyEvent ntfy = new NotifyEvent(mContext);
         ntfy.setListener(new NotifyEventListener() {
             @Override

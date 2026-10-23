@@ -34,6 +34,7 @@ import android.content.DialogInterface.OnCancelListener;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -131,7 +132,7 @@ public class ScheduleItemEditor {
 
         initDialog();
 
-        Handler hndl=new Handler();
+        Handler hndl=new Handler(Looper.getMainLooper());
         hndl.postDelayed(new Runnable() {
             @Override
             public void run() {
