@@ -25,11 +25,12 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.preference.Preference;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+
+import androidx.preference.Preference;
+import androidx.preference.PreferenceViewHolder;
 
 public class SeekBarPreference extends Preference implements OnSeekBarChangeListener {
 
@@ -59,13 +60,10 @@ public class SeekBarPreference extends Preference implements OnSeekBarChangeList
      * (SharedPreference の　shouldPersist() が true の場合、可能ならSharedPreferenceに値を格納) 
      */
     @Override
-    protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
-        if (restorePersistedValue) {
-            currentProgress = getPersistedInt(currentProgress);
-        } else {
-            currentProgress = (Integer) defaultValue;
-            persistInt(currentProgress);
-        }
+    protected void onSetInitialValue(Object defaultValue) {
+        int def = (defaultValue instanceof Integer) ? (Integer) defaultValue : DEFAULT_PROGRESS;
+        currentProgress = getPersistedInt(def);
+        persistInt(currentProgress);
         oldProgress = currentProgress;
     }
 
@@ -75,14 +73,14 @@ public class SeekBarPreference extends Preference implements OnSeekBarChangeList
      * スーパークラスの実装の呼び出しを確実に行うこと
      */
     @Override
-    protected void onBindView(View view) {
-        final SeekBar seekbar = (SeekBar) view.findViewById(R.id.pref_seekbar);
+    public void onBindViewHolder(PreferenceViewHolder holder) {
+        super.onBindViewHolder(holder);
+        final SeekBar seekbar = (SeekBar) holder.findViewById(R.id.pref_seekbar);
         if (seekbar != null) {
-            seekbar.setProgress(currentProgress);
             seekbar.setMax(MAX_PROGRESS);
+            seekbar.setProgress(currentProgress);
             seekbar.setOnSeekBarChangeListener(this);
         }
-        super.onBindView(view);
     }
 
     @Override

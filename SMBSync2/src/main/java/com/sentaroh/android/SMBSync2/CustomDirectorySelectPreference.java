@@ -26,27 +26,19 @@ OTHER DEALINGS IN THE SOFTWARE.
 import android.content.Context;
 import android.util.AttributeSet;
 
-import com.sentaroh.android.Utilities.Preference.DirectorySelectPreference;
+import androidx.preference.Preference;
 
 
 /**
  * Created by sentaroh on 2018/03/03.
  */
 
-public class CustomDirectorySelectPreference extends DirectorySelectPreference {
+public class CustomDirectorySelectPreference extends Preference {
     public CustomDirectorySelectPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
     }
 
     public CustomDirectorySelectPreference(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        init();
-    }
-
-    private void init() {
-        this.setShowRootDirectory(false);
-        this.setShowMountpointSelector(true);
-        this.setShowMountpointWritable(true);
     }
 }
